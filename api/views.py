@@ -5,6 +5,7 @@ from django.db.models import Count
 from reports.models import IncidentReport
 from organisations.models import Organisation, Donation
 from content.models import EducationContent, Quiz
+from reports.utils.sms import send_case_reference_sms
 from .serializers import (
     IncidentReportSerializer, OrganisationSerializer,
     DonationSerializer, EducationContentSerializer,
@@ -20,7 +21,28 @@ class ReportCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         import random, string
         ref = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
-        serializer.save(sms_ref_code=ref)
+
+        # Get optional phone from request
+        phone = self.request.data.get('phone', None)
+
+        report = serializer.save(sms_ref_code=ref)
+
+        # Send SMS if phone provided
+        if phone:
+            send_case_reference_sms(phone, ref)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(
+            {
+                'message': 'Report submitted successfully.',
+                'ref_code': serializer.instance.sms_ref_code,
+                'data': serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 
 class HeatmapView(APIView):
@@ -62,11 +84,11 @@ class ContentListView(generics.ListAPIView):
     def get_queryset(self):
         qs     = EducationContent.objects.filter(approved=True)
         topic  = self.request.query_params.get('topic')
-        format = self.request.query_params.get('format')
+        fmt    = self.request.query_params.get('format')
         if topic:
             qs = qs.filter(topic=topic)
-        if format:
-            qs = qs.filter(format=format)
+        if fmt:
+            qs = qs.filter(format=fmt)
         return qs
 
 

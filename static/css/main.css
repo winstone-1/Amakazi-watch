@@ -1,0 +1,37 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fa;
+}
+
+.navbar-brand {
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+
+.crisis-banner a {
+  text-decoration: none;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.btn-danger {
+  background-color: #c0392b;
+  border-color: #c0392b;
+}
+
+.btn-danger:hover {
+  background-color: #a93226;
+  border-color: #a93226;
+}
+
+footer a:hover {
+  color: #fff !important;
+}

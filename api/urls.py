@@ -19,6 +19,10 @@ urlpatterns = [
     path('quizzes/', views.QuizListView.as_view(), name='quiz-list'),
     path('quizzes/<int:pk>/complete/', views.QuizCompleteView.as_view(), name='quiz-complete'),
 
+    # Donations
+    path('donations/initiate/', views.DonationInitiateView.as_view(), name='donation-initiate'),
+    path('donations/verify/', views.DonationVerifyView.as_view(), name='donation-verify'),
+
     # Auth
     path('auth/register/', views.RegisterView.as_view(), name='register'),
     path('auth/token/', TokenObtainPairView.as_view(), name='token-obtain'),

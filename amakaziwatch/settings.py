@@ -184,3 +184,7 @@ YOUTUBE_API_KEY     = os.getenv('YOUTUBE_API_KEY')
 
 # ── Anthropic ─────────────────────────────────────────────────────────────────
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+
+# ── Paystack ──────────────────────────────────────────────────────────────────
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')

@@ -121,3 +121,71 @@ class QuizCompleteView(APIView):
 class RegisterView(generics.CreateAPIView):
     serializer_class   = UserRegisterSerializer
     permission_classes = [permissions.AllowAny]
+
+
+# ── Donations (Paystack) ──────────────────────────────────────────────────────
+class DonationInitiateView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        from organisations.utils.paystack import initialize_donation
+        from organisations.models import Organisation, Donation
+
+        org_id   = request.data.get('organisation_id')
+        amount   = request.data.get('amount')
+        email    = request.data.get('email')
+        callback = request.data.get('callback_url', 'http://localhost:8000/api/donations/verify/')
+
+        if not all([org_id, amount, email]):
+            return Response(
+                {'error': 'organisation_id, amount and email are required'},
+                status=400
+            )
+
+        try:
+            org = Organisation.objects.get(id=org_id, verified=True)
+        except Organisation.DoesNotExist:
+            return Response({'error': 'Organisation not found'}, status=404)
+
+        result = initialize_donation(email, float(amount), org_id, callback)
+
+        if result['success']:
+            Donation.objects.create(
+                organisation=org,
+                amount=amount,
+                phone=email,
+                mpesa_checkout_id=result['reference'],
+                status='pending',
+            )
+            return Response({
+                'payment_url': result['payment_url'],
+                'reference': result['reference'],
+            })
+
+        return Response({'error': result['error']}, status=400)
+
+
+class DonationVerifyView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from organisations.utils.paystack import verify_payment
+        from organisations.models import Donation
+
+        reference = request.query_params.get('reference')
+        if not reference:
+            return Response({'error': 'reference is required'}, status=400)
+
+        result = verify_payment(reference)
+
+        if result['success']:
+            try:
+                donation = Donation.objects.get(mpesa_checkout_id=reference)
+                donation.status = 'completed'
+                donation.mpesa_receipt = reference
+                donation.save()
+            except Donation.DoesNotExist:
+                pass
+            return Response({'message': 'Payment verified', 'amount': result['amount']})
+
+        return Response({'error': result['error']}, status=400)

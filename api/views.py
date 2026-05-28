@@ -31,6 +31,17 @@ class ReportCreateView(generics.CreateAPIView):
         if phone:
             send_case_reference_sms(phone, ref)
 
+        # AI classification
+        if report.description:
+            from api.utils.Groq import classify_report
+            result = classify_report(report.description, report.abuse_type)
+            if result["success"]:
+                data = result["data"]
+                report.urgency_score      = data.get("urgency_score")
+                report.ai_classification  = data.get("confirmed_abuse_type", "")
+                report.flagged_for_review = data.get("flag_for_review", False)
+                report.save()
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -196,7 +207,7 @@ class ChatView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        from api.utils.claude import chat_with_groq
+        from api.utils.Groq import chat_with_groq
         message = request.data.get("message")
         history = request.data.get("history", [])
 

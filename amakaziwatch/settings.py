@@ -56,7 +56,7 @@ SITE_ID = 1
 
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [BASE_DIR / 'templates'],
+    'DIRS': [],
     'APP_DIRS': True,
     'OPTIONS': {
         'context_processors': [
@@ -97,11 +97,10 @@ TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-MEDIA_URL = '/media/'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # ── Cloudinary ───────────────────────────────────────────────────────────────
 CLOUDINARY_STORAGE = {
@@ -182,8 +181,8 @@ MPESA_ENV             = os.getenv('MPESA_ENV', 'sandbox')
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 YOUTUBE_API_KEY     = os.getenv('YOUTUBE_API_KEY')
 
-# ── Anthropic ─────────────────────────────────────────────────────────────────
-ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+# ── GROQ ─────────────────────────────────────────────────────────────────
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
 # ── Paystack ──────────────────────────────────────────────────────────────────
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')

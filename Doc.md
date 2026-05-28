@@ -216,7 +216,7 @@ SMSLog
 | GET | `/api/quizzes/` | List approved quizzes |
 | POST | `/api/quizzes/<id>/complete/` | Log anonymised quiz completion |
 | POST | `/api/donations/initiate/` | Trigger M-Pesa STK Push |
-| POST | `/api/donations/callback/` | Safaricom Daraja webhook |
+| POST | `/api/donations/callback/` | Paystack webhook |
 | POST | `/api/chat/` | Anonymous AI chatbot |
 | POST | `/api/auth/register/` | User registration |
 | POST | `/api/auth/token/` | JWT login |

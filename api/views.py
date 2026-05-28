@@ -189,3 +189,23 @@ class DonationVerifyView(APIView):
             return Response({'message': 'Payment verified', 'amount': result['amount']})
 
         return Response({'error': result['error']}, status=400)
+
+
+# -- Claude AI Chat ------------------------------------------------------------
+class ChatView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        from api.utils.claude import chat_with_groq
+        message = request.data.get("message")
+        history = request.data.get("history", [])
+
+        if not message:
+            return Response({"error": "message is required"}, status=400)
+
+        result = chat_with_groq(message, history)
+
+        if result["success"]:
+            return Response({"message": result["message"]})
+
+        return Response({"error": result["error"]}, status=500)

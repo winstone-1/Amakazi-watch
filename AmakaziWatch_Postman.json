@@ -1,0 +1,373 @@
+{
+  "info": {
+    "name": "AmakaziWatch API",
+    "description": "GBV Awareness, Reporting and Prevention Platform — Sample Requests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "paste_your_access_token_here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/register/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@amakaziwatch.com\",\n  \"password\": \"Test@1234\"\n}"
+            },
+            "description": "Register a new user account. Returns id, username, email."
+          }
+        },
+        {
+          "name": "Login — Get JWT Token",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/token/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test@1234\"\n}"
+            },
+            "description": "Returns access and refresh JWT tokens. Copy the access token into the collection variable."
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/token/refresh/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"paste_your_refresh_token_here\"\n}"
+            },
+            "description": "Get a new access token using your refresh token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Submit Anonymous Report (no file)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/reports/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"abuse_type\": \"physical\",\n  \"relationship\": \"self\",\n  \"county\": \"Nairobi\",\n  \"sub_county\": \"Westlands\",\n  \"description\": \"Repeated physical assault by a family member over the past three months.\",\n  \"phone\": \"+254712345678\"\n}"
+            },
+            "description": "No auth required. Returns a case reference code. If phone is provided, an SMS is sent via Africa's Talking."
+          }
+        },
+        {
+          "name": "Submit Report with Evidence Photo",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/reports/",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "abuse_type", "value": "digital", "type": "text" },
+                { "key": "relationship", "value": "other", "type": "text" },
+                { "key": "county", "value": "Mombasa", "type": "text" },
+                { "key": "sub_county", "value": "Nyali", "type": "text" },
+                { "key": "description", "value": "Threatening messages and sharing of private photos without consent.", "type": "text" },
+                { "key": "phone", "value": "+254712345678", "type": "text" },
+                { "key": "evidence_file", "type": "file", "src": "" }
+              ]
+            },
+            "description": "Submit a report with an evidence photo. Use form-data. evidence_file must be set to File type in Postman. Photo is uploaded to Cloudinary."
+          }
+        },
+        {
+          "name": "Get Heatmap Data (auth required)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/reports/heatmap/",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "Returns report counts grouped by county. Requires JWT token. NGO and admin only in production."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Organisations",
+      "item": [
+        {
+          "name": "List Verified Organisations",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/",
+            "header": [],
+            "description": "No auth required. Returns all verified organisations. Filter by county using ?county=Nairobi"
+          }
+        },
+        {
+          "name": "List Organisations by County",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/organisations/?county=Nairobi",
+              "query": [
+                { "key": "county", "value": "Nairobi" }
+              ]
+            },
+            "header": [],
+            "description": "Filter organisations by county name."
+          }
+        },
+        {
+          "name": "Register New Organisation",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/organisations/register/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Msaada Centre Kisumu\",\n  \"description\": \"Community support centre providing counselling and legal aid to GBV survivors in Kisumu County.\",\n  \"services\": \"counselling,legal aid,safe shelter,psychosocial support\",\n  \"county\": \"Kisumu\",\n  \"sub_county\": \"Kisumu Central\",\n  \"phone\": \"0721000222\",\n  \"email\": \"info@msaadacentre.org\",\n  \"website\": \"https://msaadacentre.org\",\n  \"latitude\": \"-0.1022\",\n  \"longitude\": \"34.7617\"\n}"
+            },
+            "description": "Register a new organisation. Verified is false by default — admin must approve via Django admin panel."
+          }
+        },
+        {
+          "name": "Organisations GeoJSON Map",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/map/",
+            "header": [],
+            "description": "Returns all verified organisations as GeoJSON FeatureCollection for Google Maps rendering."
+          }
+        },
+        {
+          "name": "Heatmap GeoJSON (auth required)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/heatmap/",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "Returns incident counts by county for heatmap rendering. Requires auth."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Education Content",
+      "item": [
+        {
+          "name": "List Approved Content",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/content/",
+            "header": [],
+            "description": "No auth required. Returns all approved education content."
+          }
+        },
+        {
+          "name": "Filter Content by Topic",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/content/?topic=legal",
+              "query": [
+                { "key": "topic", "value": "legal" }
+              ]
+            },
+            "header": [],
+            "description": "Filter by topic. Options: recognise, legal, support, healthy, prevention"
+          }
+        },
+        {
+          "name": "Filter Content by Format",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/content/?format=article",
+              "query": [
+                { "key": "format", "value": "article" }
+              ]
+            },
+            "header": [],
+            "description": "Filter by format. Options: article, video, guide"
+          }
+        },
+        {
+          "name": "Submit Content (auth required)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/content/create/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Understanding Financial Abuse in Kenyan Households\",\n  \"body\": \"Financial abuse is one of the most common but least recognised forms of GBV. It includes controlling all household money, preventing a partner from working, and taking their earnings by force.\",\n  \"format\": \"article\",\n  \"topic\": \"recognise\",\n  \"organisation\": 1\n}"
+            },
+            "description": "Submit education content for admin approval. Requires JWT auth. Organisation must be verified."
+          }
+        },
+        {
+          "name": "YouTube Videos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/content/videos/?q=GBV+awareness+Kenya",
+              "query": [
+                { "key": "q", "value": "GBV awareness Kenya" }
+              ]
+            },
+            "header": [],
+            "description": "Search YouTube for GBV awareness videos via YouTube Data API v3. Change the q parameter to search for different topics."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "List Approved Quizzes",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/quizzes/",
+            "header": [],
+            "description": "No auth required. Returns all approved quizzes with questions."
+          }
+        },
+        {
+          "name": "Record Quiz Completion",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/quizzes/1/complete/",
+            "header": [],
+            "description": "Anonymously log a quiz completion. Increments completion_count. Replace 1 with the quiz ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Donations",
+      "item": [
+        {
+          "name": "Initiate Donation (Paystack)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/donations/initiate/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organisation_id\": 1,\n  \"amount\": 500,\n  \"email\": \"donor@example.com\",\n  \"callback_url\": \"http://localhost:8000/api/donations/verify/\"\n}"
+            },
+            "description": "Initiates a Paystack payment. Returns a payment_url — open it in the browser to complete payment. Amount is in KES."
+          }
+        },
+        {
+          "name": "Verify Donation",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/donations/verify/?reference=paste_reference_here",
+              "query": [
+                { "key": "reference", "value": "paste_reference_here" }
+              ]
+            },
+            "header": [],
+            "description": "Verify a Paystack payment by reference. Updates donation status to completed in the database."
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Chat",
+      "item": [
+        {
+          "name": "Anonymous Chatbot",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/chat/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Is it normal for my partner to check my phone every day?\",\n  \"history\": []\n}"
+            },
+            "description": "Anonymous AI chatbot powered by Anthropic Claude. No auth required. Pass conversation history as an array for multi-turn conversations."
+          }
+        },
+        {
+          "name": "Chatbot with History",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/chat/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"What should I do about it?\",\n  \"history\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Is it normal for my partner to check my phone every day?\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Constantly checking your phone without permission can be a sign of controlling behaviour, which is a form of emotional abuse...\"\n    }\n  ]\n}"
+            },
+            "description": "Multi-turn chatbot conversation. Pass previous messages in the history array."
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Docs",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/docs/",
+            "header": [],
+            "description": "Open in browser to see full interactive Swagger documentation for all endpoints."
+          }
+        },
+        {
+          "name": "OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/schema/",
+            "header": [],
+            "description": "Download the raw OpenAPI JSON schema."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+import pytest
+from rest_framework.test import APIClient
+from django.contrib.auth import get_user_model
+from reports.models import IncidentReport
+from organisations.models import Organisation
+from content.models import EducationContent, Quiz
+
+User = get_user_model()
+
+
+@pytest.fixture
+def client():
+    return APIClient()
+
+
+@pytest.fixture
+def user(db):
+    return User.objects.create_user(
+        username="testuser",
+        email="test@amakaziwatch.com",
+        password="Test@1234"
+    )
+
+
+@pytest.fixture
+def auth_client(client, user):
+    response = client.post("/api/auth/token/", {
+        "username": "testuser",
+        "password": "Test@1234"
+    }, format="json")
+    token = response.data["access"]
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+    return client
+
+
+@pytest.fixture
+def org(db):
+    return Organisation.objects.create(
+        name="Test NGO",
+        description="Test",
+        services="counselling",
+        county="Nairobi",
+        verified=True,
+    )
+
+
+# ── Auth Tests ────────────────────────────────────────────────────────────────
+@pytest.mark.django_db
+def test_register_user(client):
+    response = client.post("/api/auth/register/", {
+        "username": "newuser",
+        "email": "new@test.com",
+        "password": "Test@1234"
+    }, format="json")
+    assert response.status_code == 201
+    assert response.data["username"] == "newuser"
+
+
+@pytest.mark.django_db
+def test_login_returns_token(client, user):
+    response = client.post("/api/auth/token/", {
+        "username": "testuser",
+        "password": "Test@1234"
+    }, format="json")
+    assert response.status_code == 200
+    assert "access" in response.data
+    assert "refresh" in response.data
+
+
+@pytest.mark.django_db
+def test_login_wrong_password(client, user):
+    response = client.post("/api/auth/token/", {
+        "username": "testuser",
+        "password": "wrongpassword"
+    }, format="json")
+    assert response.status_code == 401
+
+
+# ── Report Tests ──────────────────────────────────────────────────────────────
+@pytest.mark.django_db
+def test_submit_report_no_auth(client):
+    response = client.post("/api/reports/", {
+        "abuse_type": "physical",
+        "relationship": "self",
+        "county": "Nairobi",
+        "sub_county": "Westlands",
+        "description": "Test report"
+    }, format="json")
+    assert response.status_code == 201
+    assert "ref_code" in response.data
+
+
+@pytest.mark.django_db
+def test_report_generates_ref_code(client):
+    response = client.post("/api/reports/", {
+        "abuse_type": "emotional",
+        "relationship": "family",
+        "county": "Mombasa",
+    }, format="json")
+    assert response.status_code == 201
+    assert len(response.data["ref_code"]) == 8
+
+
+@pytest.mark.django_db
+def test_heatmap_requires_auth(client):
+    response = client.get("/api/reports/heatmap/")
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_heatmap_with_auth(auth_client):
+    response = auth_client.get("/api/reports/heatmap/")
+    assert response.status_code == 200
+
+
+# ── Organisation Tests ────────────────────────────────────────────────────────
+@pytest.mark.django_db
+def test_list_organisations_public(client, org):
+    response = client.get("/api/organisations/")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+
+@pytest.mark.django_db
+def test_unverified_org_not_listed(client):
+    Organisation.objects.create(
+        name="Unverified NGO",
+        description="Test",
+        services="legal aid",
+        county="Kisumu",
+        verified=False,
+    )
+    response = client.get("/api/organisations/")
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_filter_organisations_by_county(client, org):
+    Organisation.objects.create(
+        name="Mombasa NGO",
+        description="Test",
+        services="counselling",
+        county="Mombasa",
+        verified=True,
+    )
+    response = client.get("/api/organisations/?county=Nairobi")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["county"] == "Nairobi"
+
+
+# ── Content Tests ─────────────────────────────────────────────────────────────
+@pytest.mark.django_db
+def test_list_content_public(client, org):
+    EducationContent.objects.create(
+        title="Test Article",
+        body="Test body",
+        format="article",
+        topic="legal",
+        organisation=org,
+        approved=True,
+    )
+    response = client.get("/api/content/")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+
+@pytest.mark.django_db
+def test_unapproved_content_not_listed(client, org):
+    EducationContent.objects.create(
+        title="Unapproved Article",
+        body="Test",
+        format="article",
+        topic="legal",
+        organisation=org,
+        approved=False,
+    )
+    response = client.get("/api/content/")
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_create_content_requires_auth(client, org):
+    response = client.post("/api/content/create/", {
+        "title": "Test",
+        "body": "Test body",
+        "format": "article",
+        "topic": "legal",
+        "organisation": org.id,
+    }, format="json")
+    assert response.status_code == 401
+
+
+# ── Analytics Tests ───────────────────────────────────────────────────────────
+@pytest.mark.django_db
+def test_analytics_requires_auth(client):
+    response = client.get("/api/analytics/county-summary/")
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_analytics_with_auth_no_data(auth_client):
+    response = auth_client.get("/api/analytics/county-summary/")
+    assert response.status_code == 404

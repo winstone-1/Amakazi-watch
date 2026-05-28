@@ -220,3 +220,40 @@ class ChatView(APIView):
             return Response({"message": result["message"]})
 
         return Response({"error": result["error"]}, status=500)
+
+
+# -- Analytics / CSV Export ---------------------------------------------------
+class CountySummaryExportView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from reports.utils.analytics import generate_county_summary
+        from django.http import HttpResponse
+
+        days = int(request.query_params.get("days", 30))
+        csv_data, error = generate_county_summary(days=days)
+
+        if error:
+            return Response({"error": error}, status=404)
+
+        response = HttpResponse(csv_data, content_type="text/csv")
+        response["Content-Disposition"] = f"attachment; filename=amakaziwatch_county_summary_{days}days.csv"
+        return response
+
+
+class TrendReportExportView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from reports.utils.analytics import generate_trend_report
+        from django.http import HttpResponse
+
+        days = int(request.query_params.get("days", 30))
+        csv_data, error = generate_trend_report(days=days)
+
+        if error:
+            return Response({"error": error}, status=404)
+
+        response = HttpResponse(csv_data, content_type="text/csv")
+        response["Content-Disposition"] = f"attachment; filename=amakaziwatch_trend_{days}days.csv"
+        return response

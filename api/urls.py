@@ -23,6 +23,10 @@ urlpatterns = [
     path('donations/initiate/', views.DonationInitiateView.as_view(), name='donation-initiate'),
     path('donations/verify/', views.DonationVerifyView.as_view(), name='donation-verify'),
 
+    # Analytics
+    path("analytics/county-summary/", views.CountySummaryExportView.as_view(), name="county-summary"),
+    path("analytics/trend/", views.TrendReportExportView.as_view(), name="trend-report"),
+
     # Chat
     path('chat/', views.ChatView.as_view(), name='chat'),
 

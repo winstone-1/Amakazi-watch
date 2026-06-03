@@ -115,3 +115,19 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
         )
         return user
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    email    = serializers.CharField(source='user.email', read_only=True)
+    role     = serializers.CharField(source='user.role', read_only=True)
+
+    class Meta:
+        from users.profile import UserProfile
+        model  = UserProfile
+        fields = [
+            'id', 'username', 'email', 'role',
+            'county', 'bio', 'avatar_url',
+            'bookmarked_orgs', 'case_refs', 'created_at'
+        ]
+        read_only_fields = ['created_at']

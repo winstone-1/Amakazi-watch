@@ -204,3 +204,89 @@ def test_analytics_requires_auth(client):
 def test_analytics_with_auth_no_data(auth_client):
     response = auth_client.get("/api/analytics/county-summary/")
     assert response.status_code == 404
+
+
+# -- Password Reset Tests -----------------------------------------------------
+@pytest.mark.django_db
+def test_password_reset_request_valid_email(client, user):
+    response = client.post("/api/auth/password-reset/", {
+        "email": "test@amakaziwatch.com"
+    }, format="json")
+    assert response.status_code == 200
+    assert "message" in response.data
+
+
+@pytest.mark.django_db
+def test_password_reset_request_invalid_email(client):
+    response = client.post("/api/auth/password-reset/", {
+        "email": "nonexistent@test.com"
+    }, format="json")
+    # Always returns 200 to prevent email enumeration
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_password_reset_missing_email(client):
+    response = client.post("/api/auth/password-reset/", {}, format="json")
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_password_change_correct(auth_client):
+    response = auth_client.post("/api/auth/password-change/", {
+        "old_password": "Test@1234",
+        "new_password": "NewPass@5678"
+    }, format="json")
+    assert response.status_code == 200
+    assert "message" in response.data
+
+
+@pytest.mark.django_db
+def test_password_change_wrong_old_password(auth_client):
+    response = auth_client.post("/api/auth/password-change/", {
+        "old_password": "wrongpassword",
+        "new_password": "NewPass@5678"
+    }, format="json")
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_password_change_requires_auth(client):
+    response = client.post("/api/auth/password-change/", {
+        "old_password": "Test@1234",
+        "new_password": "NewPass@5678"
+    }, format="json")
+    assert response.status_code == 401
+
+
+# -- 2FA Tests ----------------------------------------------------------------
+@pytest.mark.django_db
+def test_2fa_setup_returns_qr(auth_client):
+    response = auth_client.get("/api/auth/2fa/setup/")
+    assert response.status_code == 200
+    assert "qr_code" in response.data
+    assert "secret" in response.data
+
+
+@pytest.mark.django_db
+def test_2fa_verify_invalid_code(auth_client):
+    # Setup first
+    auth_client.get("/api/auth/2fa/setup/")
+    response = auth_client.post("/api/auth/2fa/verify/", {
+        "code": "000000"
+    }, format="json")
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_2fa_disable_requires_password(auth_client):
+    response = auth_client.post("/api/auth/2fa/disable/", {}, format="json")
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_2fa_disable_wrong_password(auth_client):
+    response = auth_client.post("/api/auth/2fa/disable/", {
+        "password": "wrongpassword"
+    }, format="json")
+    assert response.status_code == 400

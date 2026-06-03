@@ -1,7 +1,16 @@
 from django.db import models
 
 class Organisation(models.Model):
+    class OrgType(models.TextChoices):
+        NGO            = "ngo",            "NGO"
+        COUNTY_GOVT    = "county_govt",    "County Government"
+        LEGAL_AID      = "legal_aid",      "Legal Aid Clinic"
+        HEALTH         = "health",         "Health Facility"
+        COUNSELLING    = "counselling",    "Counselling Centre"
+        OTHER          = "other",          "Other"
+
     name         = models.CharField(max_length=200)
+    org_type     = models.CharField(max_length=20, choices=OrgType.choices, default=OrgType.NGO)
     description  = models.TextField()
     services     = models.TextField(help_text="Comma-separated list of services")
     county       = models.CharField(max_length=100)
@@ -16,16 +25,16 @@ class Organisation(models.Model):
     created_at   = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.get_org_type_display()})"
 
 
 class Donation(models.Model):
     class Status(models.TextChoices):
-        PENDING   = 'pending',   'Pending'
-        COMPLETED = 'completed', 'Completed'
-        FAILED    = 'failed',    'Failed'
+        PENDING   = "pending",   "Pending"
+        COMPLETED = "completed", "Completed"
+        FAILED    = "failed",    "Failed"
 
-    organisation      = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name='donations')
+    organisation      = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="donations")
     amount            = models.DecimalField(max_digits=10, decimal_places=2)
     phone             = models.CharField(max_length=15)
     mpesa_checkout_id = models.CharField(max_length=100, blank=True)
@@ -34,4 +43,4 @@ class Donation(models.Model):
     created_at        = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.organisation} — KES {self.amount} — {self.status}"
+        return f"{self.organisation} - KES {self.amount} - {self.status}"

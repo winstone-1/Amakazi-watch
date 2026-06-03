@@ -62,71 +62,6 @@ NGOs, legal aid clinics, safe houses, and counselling centres register through D
 
 ---
 
-## UI — Pages & What They Contain
-
-### Home `/`
-- Bold hero with two CTAs: *Report Anonymously* and *Find Help Near Me*
-- Crisis banner: Africa's Talking SMS number for non-smartphone users
-- Live counters: reports this month, organisations listed
-- Three feature cards explaining the pillars
-- Latest 3 education articles
-- Footer: emergency numbers — GBV Hotline 1195, Childline 116
-
-### Report Page `/report`
-- Multi-step form — no account required
-  - Step 1: abuse type icon grid
-  - Step 2: county/sub-county dropdowns
-  - Step 3: description + optional Cloudinary image upload
-  - Step 4: optional phone number for SMS case reference
-- Progress bar across steps
-- Plain-language copy at every step to reduce fear and friction
-- Confirmation screen with case reference + SMS sent via Africa's Talking
-
-### Education Hub `/learn`
-- Filter bar: by topic and format (article, video, guide, quiz)
-- Article cards with organisation author, read time, topic badge
-- YouTube video embeds via YouTube Data API
-- Gamified awareness quizzes — spot early abuse signs, track anonymised completion stats
-- AI chat widget (bottom-right): anonymous Q&A powered by Anthropic Claude API
-- PDF resource download cards for community health workers
-
-### Organisation Directory `/organisations`
-- Search bar + county filter
-- Card grid: name, services, coverage area, verified badge
-- Google Maps panel with clustered org pins
-- Org detail page: full profile + M-Pesa donate button
-
-### Heatmap Dashboard `/heatmap` — NGO & Admin only
-- Choropleth map of Kenya: counties coloured by report density
-- Filter by abuse type, date range, sub-county
-- Trend line chart: reports over time
-- CSV export for NGO reporting
-- RBAC-protected: only verified org staff and admin
-
-### NGO Impact Dashboard `/dashboard` — NGO only
-- Total reports in coverage area responded to
-- Donations received (total + breakdown)
-- Referrals made and received
-- Content published and approval status
-- Monthly trend charts
-
-### Organisation Registration `/register/org`
-- Multi-step: org details, services, coverage area, document upload (Cloudinary)
-- Pending state until admin approves
-- On approval: account gets `org_staff` role
-
-### Auth Pages `/login` `/register` `/password-reset`
-- Django built-in auth + crispy forms styling
-- Google Sign-In via django-allauth for org accounts
-- Two-factor auth for admin accounts
-
-### Django Admin `/admin`
-- Approve/reject organisation registrations
-- Moderate education content
-- View all anonymised reports with filters
-- Manage user roles
-
----
 
 ## Tech Stack
 
@@ -152,7 +87,7 @@ NGOs, legal aid clinics, safe houses, and counselling centres register through D
 ## AI Integration
 
 ### Anonymous Support Chatbot
-Floating chat widget on `/learn`. Powered by Anthropic Claude API. Users ask questions like *"Is what my partner doing abuse?"* and get safe, trauma-informed responses. No account needed, nothing persisted server-side. Always surfaces the national hotline (1195) for crisis situations.
+Floating chat widget on `/learn`. Powered by Anthropic Groq API. Users ask questions like *"Is what my partner doing abuse?"* and get safe, trauma-informed responses. No account needed, nothing persisted server-side. Always surfaces the national hotline (1195) for crisis situations.
 
 ### Report Urgency Classifier
 On report submission, a background task sends the description to Claude which returns:
@@ -262,7 +197,7 @@ SMSLog
 - Cloudinary file storage
 - M-Pesa Daraja donations
 - Google Maps org directory
-- Claude AI chatbot + report classifier + content moderation
+- Groq AI chatbot + report classifier + content moderation
 - Gamified quizzes + NGO impact dashboard
 - Swagger docs + pytest suite
 - Deployed on Render
@@ -319,7 +254,7 @@ SMSLog
 - [ ] `git commit -m "feat(integrations): AT SMS, M-Pesa Daraja, Google Maps, YouTube API"`
 
 ### Friday 30 May · AI + Templates + Tests
-- [ ] Claude API chatbot endpoint
+- [ ] Groq API chatbot endpoint
 - [ ] Report urgency classifier
 - [ ] Content moderation assistant
 - [ ] Django templates: all pages rendering cleanly

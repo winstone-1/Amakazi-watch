@@ -52,3 +52,4 @@ uritemplate==4.2.0
 urllib3==2.7.0
 Pillow>=10.0
 groq>=0.9.0
+cryptography>=42.0

@@ -74,19 +74,15 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'amakaziwatch.wsgi.application'
 
-# ── MySQL Database ───────────────────────────────────────────────────────────
+# ── PostgreSQL Database ──────────────────────────────────────────────────────
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME':     os.getenv('DB_NAME', 'amakaziwatch'),
         'USER':     os.getenv('DB_USER', 'amakaziwatch_user'),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST':     os.getenv('DB_HOST', 'localhost'),
-        'PORT':     os.getenv('DB_PORT', '3306'),
-        'OPTIONS': {
-    'charset': 'utf8mb4',
-    'ssl': {'ssl-mode': 'REQUIRED'},
-},
+        'PORT':     os.getenv('DB_PORT', '5432'),
     }
 }
 

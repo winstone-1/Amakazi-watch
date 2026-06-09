@@ -42,13 +42,12 @@ AmakaziWatch is a REST API backend that powers a GBV (Gender-Based Violence) awa
 | Layer | Technology |
 |---|---|
 | Framework | Django 5 + Django REST Framework |
-| Database | MySQL 8 (Aiven hosted in production) |
+| Database | PostgreSQL Deployed on render |
 | Auth | SimpleJWT + django-allauth (Google OAuth) + django-otp (2FA) |
 | File Storage | Cloudinary |
 | SMS | Africa's Talking SMS API |
 | Payments | Paystack |
 | Maps | Google Maps JavaScript API |
-| Video | YouTube Data API v3 |
 | AI | Groq API (LLaMA 3.3 70B) |
 | Analytics | Pandas |
 | API Docs | drf-spectacular (Swagger UI at `/docs/`) |

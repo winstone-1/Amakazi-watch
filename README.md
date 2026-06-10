@@ -50,7 +50,7 @@ AmakaziWatch is a REST API backend that powers a GBV (Gender-Based Violence) awa
 | Maps | Google Maps JavaScript API |
 | AI | Groq API (LLaMA 3.3 70B) |
 | Analytics | Pandas |
-| API Docs | drf-spectacular (Swagger UI at `/docs/`, Redoc at `/redoc/`) |
+| API Docs | drf-spectacular (Swagger UI at `/docs/` and `/swagger/`, Redoc at `/redoc/`) |
 | Testing | pytest-django |
 | Deployment | Render + Docker |
 
@@ -97,7 +97,7 @@ amakaziwatch/
 ### Prerequisites
 
 - Python 3.12
-- MySQL 8
+- PostgreSQL
 - Git
 
 ### Installation
@@ -127,7 +127,7 @@ cp .env.example .env
 nano .env
 ```
 
-**5. Create MySQL database**
+**5. Create M database**
 ```bash
 sudo mysql
 ```

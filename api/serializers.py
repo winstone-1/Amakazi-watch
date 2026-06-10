@@ -117,6 +117,47 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+class DonationInitiateSerializer(serializers.Serializer):
+    organisation_id = serializers.IntegerField()
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    email = serializers.EmailField()
+    callback_url = serializers.URLField(required=False)
+
+
+class ChatSerializer(serializers.Serializer):
+    message = serializers.CharField()
+    history = serializers.ListField(
+        child=serializers.CharField(), required=False, allow_empty=True
+    )
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField(min_length=8)
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    old_password = serializers.CharField()
+    new_password = serializers.CharField(min_length=8)
+
+
+class TwoFactorVerifySerializer(serializers.Serializer):
+    code = serializers.CharField()
+
+
+class TwoFactorDisableSerializer(serializers.Serializer):
+    password = serializers.CharField()
+
+
+class GoogleAuthCallbackSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     email    = serializers.CharField(source='user.email', read_only=True)

@@ -6,6 +6,7 @@ def home(request):
         "description": "GBV Awareness, Reporting and Prevention Platform for Kenya",
         "version": "1.0.0",
         "status": "running",
+        "swagger": "/swagger/",
         "docs": "/docs/",
         "redoc": "/redoc/",
         "schema": "/api/schema/",

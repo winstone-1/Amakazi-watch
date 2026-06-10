@@ -1,4 +1,8 @@
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import (
+    extend_schema, extend_schema_view,
+    OpenApiParameter, OpenApiResponse,
+    OpenApiExample, OpenApiTypes
+)
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,11 +14,43 @@ from reports.utils.sms import send_case_reference_sms
 from .serializers import (
     IncidentReportSerializer, OrganisationSerializer,
     DonationSerializer, EducationContentSerializer,
-    QuizSerializer, UserRegisterSerializer
+    QuizSerializer, UserRegisterSerializer,
+    DonationInitiateSerializer, ChatSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer,
+    PasswordChangeSerializer,
+    TwoFactorVerifySerializer,
+    TwoFactorDisableSerializer,
+    GoogleAuthCallbackSerializer,
 )
 
 
 # ── Reports ───────────────────────────────────────────────────────────────────
+@extend_schema(
+    tags=['Reports'],
+    request=IncidentReportSerializer,
+    responses={
+        201: OpenApiResponse(
+            response=IncidentReportSerializer,
+            description='Report submitted successfully.',
+            examples=[
+                OpenApiExample(
+                    'ReportExample',
+                    summary='Example incident report',
+                    value={
+                        'abuse_type': 'Physical',
+                        'relationship': 'Stranger',
+                        'county': 'Nairobi',
+                        'sub_county': 'Westlands',
+                        'description': 'I witnessed a violent incident near the market.',
+                        'phone': '+254700000000',
+                    },
+                    request_only=True,
+                )
+            ]
+        )
+    }
+)
 class ReportCreateView(generics.CreateAPIView):
     serializer_class   = IncidentReportSerializer
     permission_classes = [permissions.AllowAny]
@@ -57,6 +93,13 @@ class ReportCreateView(generics.CreateAPIView):
         )
 
 
+@extend_schema(
+    tags=['Reports'],
+    responses=OpenApiResponse(
+        response=list,
+        description='County heatmap report counts'
+    )
+)
 class HeatmapView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -71,6 +114,19 @@ class HeatmapView(APIView):
 
 
 # ── Organisations ─────────────────────────────────────────────────────────────
+@extend_schema(
+    tags=['Organisations'],
+    parameters=[
+        OpenApiParameter(
+            name='county',
+            location=OpenApiParameter.QUERY,
+            description='Filter organisations by county',
+            required=False,
+            type=str,
+        ),
+    ],
+    responses=OpenApiResponse(response=OrganisationSerializer(many=True))
+)
 class OrganisationListView(generics.ListAPIView):
     serializer_class   = OrganisationSerializer
     permission_classes = [permissions.AllowAny]
@@ -83,12 +139,37 @@ class OrganisationListView(generics.ListAPIView):
         return qs
 
 
+@extend_schema(
+    tags=['Organisations'],
+    request=OrganisationSerializer,
+    responses=OpenApiResponse(response=OrganisationSerializer)
+)
 class OrganisationRegisterView(generics.CreateAPIView):
     serializer_class   = OrganisationSerializer
     permission_classes = [permissions.AllowAny]
 
 
 # ── Content ───────────────────────────────────────────────────────────────────
+@extend_schema(
+    tags=['Content'],
+    parameters=[
+        OpenApiParameter(
+            name='topic',
+            location=OpenApiParameter.QUERY,
+            description='Filter content by topic',
+            required=False,
+            type=str,
+        ),
+        OpenApiParameter(
+            name='format',
+            location=OpenApiParameter.QUERY,
+            description='Filter content by format',
+            required=False,
+            type=str,
+        ),
+    ],
+    responses=OpenApiResponse(response=EducationContentSerializer(many=True))
+)
 class ContentListView(generics.ListAPIView):
     serializer_class   = EducationContentSerializer
     permission_classes = [permissions.AllowAny]
@@ -104,18 +185,34 @@ class ContentListView(generics.ListAPIView):
         return qs
 
 
+@extend_schema(
+    tags=['Content'],
+    request=EducationContentSerializer,
+    responses=OpenApiResponse(response=EducationContentSerializer)
+)
 class ContentCreateView(generics.CreateAPIView):
     serializer_class   = EducationContentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 # ── Quizzes ───────────────────────────────────────────────────────────────────
+@extend_schema(
+    tags=['Content'],
+    responses=OpenApiResponse(response=QuizSerializer(many=True))
+)
 class QuizListView(generics.ListAPIView):
     serializer_class   = QuizSerializer
     permission_classes = [permissions.AllowAny]
     queryset           = Quiz.objects.filter(approved=True)
 
 
+@extend_schema(
+    tags=['Content'],
+    responses=OpenApiResponse(
+        response=OpenApiTypes.OBJECT,
+        description='Quiz completion acknowledgement'
+    )
+)
 class QuizCompleteView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -130,12 +227,38 @@ class QuizCompleteView(APIView):
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
+@extend_schema(
+    tags=['Auth'],
+    request=UserRegisterSerializer,
+    responses=OpenApiResponse(response=UserRegisterSerializer)
+)
 class RegisterView(generics.CreateAPIView):
     serializer_class   = UserRegisterSerializer
     permission_classes = [permissions.AllowAny]
 
 
-# ── Donations (Paystack) ──────────────────────────────────────────────────────
+# ── Donations (Paystack) ───────────────────────────────────────────────────────
+@extend_schema(
+    tags=['Donations'],
+    request=DonationInitiateSerializer,
+    responses=OpenApiResponse(
+        response=DonationSerializer,
+        description='Donation initialization response',
+        examples=[
+            OpenApiExample(
+                'DonationInitExample',
+                summary='Initialize Paystack donation',
+                value={
+                    'organisation_id': 1,
+                    'amount': '500.00',
+                    'email': 'donor@example.com',
+                    'callback_url': 'https://example.com/callback/',
+                },
+                request_only=True,
+            )
+        ]
+    )
+)
 class DonationInitiateView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -177,6 +300,19 @@ class DonationInitiateView(APIView):
         return Response({'error': result['error']}, status=400)
 
 
+@extend_schema(
+    tags=['Donations'],
+    parameters=[
+        OpenApiParameter(
+            name='reference',
+            location=OpenApiParameter.QUERY,
+            description='Paystack payment reference to verify',
+            required=True,
+            type=str,
+        ),
+    ],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class DonationVerifyView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -204,6 +340,11 @@ class DonationVerifyView(APIView):
 
 
 # -- Claude AI Chat ------------------------------------------------------------
+@extend_schema(
+    tags=['Chat'],
+    request=ChatSerializer,
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class ChatView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -224,6 +365,19 @@ class ChatView(APIView):
 
 
 # -- Analytics / CSV Export ---------------------------------------------------
+@extend_schema(
+    tags=['Analytics'],
+    parameters=[
+        OpenApiParameter(
+            name='days',
+            location=OpenApiParameter.QUERY,
+            description='Number of days to include in the summary',
+            required=False,
+            type=int,
+        ),
+    ],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class CountySummaryExportView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -242,6 +396,19 @@ class CountySummaryExportView(APIView):
         return response
 
 
+@extend_schema(
+    tags=['Analytics'],
+    parameters=[
+        OpenApiParameter(
+            name='days',
+            location=OpenApiParameter.QUERY,
+            description='Number of days to include in the trend report',
+            required=False,
+            type=int,
+        ),
+    ],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class TrendReportExportView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -261,6 +428,10 @@ class TrendReportExportView(APIView):
 
 
 # -- Report Statistics --------------------------------------------------------
+@extend_schema(
+    tags=['Reports'],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class ReportStatsView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -301,6 +472,10 @@ class ReportStatsView(APIView):
 
 
 # -- NGO / County Impact Dashboard --------------------------------------------
+@extend_schema(
+    tags=['Organisations'],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class OrganisationImpactView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -343,6 +518,19 @@ class OrganisationImpactView(APIView):
 
 
 # -- Search -------------------------------------------------------------------
+@extend_schema(
+    tags=['Search'],
+    parameters=[
+        OpenApiParameter(
+            name='q',
+            location=OpenApiParameter.QUERY,
+            description='Search text for organisations, content and quizzes',
+            required=True,
+            type=str,
+        ),
+    ],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class SearchView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -384,6 +572,10 @@ class SearchView(APIView):
 
 
 # -- Featured Content ---------------------------------------------------------
+@extend_schema(
+    tags=['Content'],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class FeaturedContentView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -404,6 +596,12 @@ class FeaturedContentView(APIView):
 
 
 # -- User Profile -------------------------------------------------------------
+@extend_schema(
+    tags=['Profile'],
+    responses={
+        200: OpenApiResponse(response=OpenApiTypes.OBJECT),
+    }
+)
 class ProfileView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -427,6 +625,10 @@ class ProfileView(APIView):
 
 
 # -- Bookmark Organisation ----------------------------------------------------
+@extend_schema(
+    tags=['Organisations'],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class BookmarkOrgView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -450,6 +652,10 @@ class BookmarkOrgView(APIView):
 
 
 # -- County Official Heatmap --------------------------------------------------
+@extend_schema(
+    tags=['Reports'],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class CountyOfficialHeatmapView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -480,6 +686,10 @@ class CountyOfficialHeatmapView(APIView):
 
 
 # -- Maps ---------------------------------------------------------------------
+@extend_schema(
+    tags=['Organisations'],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class OrganisationsGeoJSONView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -488,6 +698,10 @@ class OrganisationsGeoJSONView(APIView):
         return Response(get_organisations_geojson())
 
 
+@extend_schema(
+    tags=['Organisations'],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class HeatmapGeoJSONView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -497,6 +711,19 @@ class HeatmapGeoJSONView(APIView):
 
 
 # -- YouTube ------------------------------------------------------------------
+@extend_schema(
+    tags=['Content'],
+    parameters=[
+        OpenApiParameter(
+            name='q',
+            location=OpenApiParameter.QUERY,
+            description='Search term for YouTube videos',
+            required=False,
+            type=str,
+        ),
+    ],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class YoutubeVideosView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -508,6 +735,11 @@ class YoutubeVideosView(APIView):
 
 
 # -- Password Reset -----------------------------------------------------------
+@extend_schema(
+    tags=['Auth'],
+    request=PasswordResetRequestSerializer,
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -542,6 +774,11 @@ class PasswordResetRequestView(APIView):
         return Response({"message": "If that email exists, a reset link has been sent."})
 
 
+@extend_schema(
+    tags=['Auth'],
+    request=PasswordResetConfirmSerializer,
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -575,6 +812,11 @@ class PasswordResetConfirmView(APIView):
         return Response({"message": "Password reset successfully. You can now log in."})
 
 
+@extend_schema(
+    tags=['Auth'],
+    request=PasswordChangeSerializer,
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class PasswordChangeView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -597,6 +839,10 @@ class PasswordChangeView(APIView):
 
 
 # -- Two Factor Auth ----------------------------------------------------------
+@extend_schema(
+    tags=['Auth'],
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class TwoFactorSetupView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -650,6 +896,11 @@ class TwoFactorSetupView(APIView):
         return Response({"error": "Invalid code. Try again."}, status=400)
 
 
+@extend_schema(
+    tags=['Auth'],
+    request=TwoFactorVerifySerializer,
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class TwoFactorVerifyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -675,6 +926,11 @@ class TwoFactorVerifyView(APIView):
         return Response({"error": "Invalid or expired code"}, status=400)
 
 
+@extend_schema(
+    tags=['Auth'],
+    request=TwoFactorDisableSerializer,
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
 class TwoFactorDisableView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -690,3 +946,35 @@ class TwoFactorDisableView(APIView):
 
         TOTPDevice.objects.filter(user=request.user).delete()
         return Response({"message": "2FA disabled successfully."})
+
+
+# -- Google OAuth Token Exchange ----------------------------------------------
+@extend_schema(
+    tags=['Auth'],
+    request=GoogleAuthCallbackSerializer,
+    responses=OpenApiResponse(response=OpenApiTypes.OBJECT)
+)
+class GoogleAuthCallbackView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        from rest_framework_simplejwt.tokens import RefreshToken
+        from allauth.socialaccount.models import SocialAccount
+
+        uid = request.data.get("uid")
+        if not uid:
+            return Response({"error": "uid is required"}, status=400)
+
+        try:
+            social_account = SocialAccount.objects.get(uid=uid, provider="google")
+            user = social_account.user
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "access":   str(refresh.access_token),
+                "refresh":  str(refresh),
+                "username": user.username,
+                "email":    user.email,
+                "role":     user.role,
+            })
+        except SocialAccount.DoesNotExist:
+            return Response({"error": "Google account not found"}, status=404)

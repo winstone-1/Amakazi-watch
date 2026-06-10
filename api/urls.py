@@ -1,6 +1,21 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from . import views
+
+TokenObtainPairView = extend_schema_view(
+    post=extend_schema(
+        tags=['Auth'],
+        summary='Obtain JWT access and refresh tokens',
+    )
+)(TokenObtainPairView)
+
+TokenRefreshView = extend_schema_view(
+    post=extend_schema(
+        tags=['Auth'],
+        summary='Refresh JWT access token',
+    )
+)(TokenRefreshView)
 
 urlpatterns = [
     # Reports
@@ -53,6 +68,8 @@ urlpatterns = [
     path("auth/2fa/setup/", views.TwoFactorSetupView.as_view(), name="2fa-setup"),
     path("auth/2fa/verify/", views.TwoFactorVerifyView.as_view(), name="2fa-verify"),
     path("auth/2fa/disable/", views.TwoFactorDisableView.as_view(), name="2fa-disable"),
+
+    path("auth/google/callback/", views.GoogleAuthCallbackView.as_view(), name="google-callback"),
 
     # Auth
     path("auth/register/", views.RegisterView.as_view(), name="register"),

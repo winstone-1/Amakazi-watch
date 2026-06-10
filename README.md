@@ -50,7 +50,7 @@ AmakaziWatch is a REST API backend that powers a GBV (Gender-Based Violence) awa
 | Maps | Google Maps JavaScript API |
 | AI | Groq API (LLaMA 3.3 70B) |
 | Analytics | Pandas |
-| API Docs | drf-spectacular (Swagger UI at `/docs/`) |
+| API Docs | drf-spectacular (Swagger UI at `/docs/`, Redoc at `/redoc/`) |
 | Testing | pytest-django |
 | Deployment | Render + Docker |
 

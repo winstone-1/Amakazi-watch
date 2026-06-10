@@ -7,6 +7,8 @@ def home(request):
         "version": "1.0.0",
         "status": "running",
         "docs": "/docs/",
+        "redoc": "/redoc/",
+        "schema": "/api/schema/",
         "endpoints": {
             "auth": {
                 "register": "/api/auth/register/",

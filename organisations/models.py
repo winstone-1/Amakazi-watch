@@ -36,7 +36,7 @@ class Donation(models.Model):
 
     organisation      = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="donations")
     amount            = models.DecimalField(max_digits=10, decimal_places=2)
-    phone             = models.CharField(max_length=15)
+    phone             = models.CharField(max_length=100)
     mpesa_checkout_id = models.CharField(max_length=100, blank=True)
     mpesa_receipt     = models.CharField(max_length=100, blank=True)
     status            = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)

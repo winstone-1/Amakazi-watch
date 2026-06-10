@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "AmakaziWatch API",
-    "description": "GBV Awareness, Reporting and Prevention Platform — Sample Requests",
+    "description": "Kenya's first crowdsourced GBV awareness, reporting and prevention platform.\n\nBase URL: http://127.0.0.1:8000\n\nAfter login, copy the access token and set it in the collection variable 'access_token'.\n\nEmergency Numbers: GBV Hotline 1195 | Childline 116 | Police 999",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -14,6 +14,11 @@
       "key": "access_token",
       "value": "paste_your_access_token_here",
       "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "paste_your_refresh_token_here",
+      "type": "string"
     }
   ],
   "item": [
@@ -25,14 +30,12 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/auth/register/",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@amakaziwatch.com\",\n  \"password\": \"Test@1234\"\n}"
             },
-            "description": "Register a new user account. Returns id, username, email."
+            "description": "Register a new user. Returns id, username, email. Default role is 'public'."
           }
         },
         {
@@ -40,14 +43,12 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/auth/token/",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test@1234\"\n}"
             },
-            "description": "Returns access and refresh JWT tokens. Copy the access token into the collection variable."
+            "description": "Returns access and refresh JWT tokens. Copy access token into the collection variable 'access_token'."
           }
         },
         {
@@ -55,14 +56,113 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/auth/token/refresh/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            },
+            "description": "Get a new access token using your refresh token."
+          }
+        },
+        {
+          "name": "Password Reset Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/password-reset/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@amakaziwatch.com\"\n}"
+            },
+            "description": "Request a password reset email. Always returns 200 to prevent email enumeration."
+          }
+        },
+        {
+          "name": "Password Reset Confirm",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/password-reset/confirm/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uid\": \"paste_uid_from_email\",\n  \"token\": \"paste_token_from_email\",\n  \"password\": \"NewPass@5678\"\n}"
+            },
+            "description": "Confirm password reset with uid and token from the reset email."
+          }
+        },
+        {
+          "name": "Password Change",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/password-change/",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refresh\": \"paste_your_refresh_token_here\"\n}"
+              "raw": "{\n  \"old_password\": \"Test@1234\",\n  \"new_password\": \"NewPass@5678\"\n}"
             },
-            "description": "Get a new access token using your refresh token."
+            "description": "Change password for authenticated user. Requires JWT token."
+          }
+        },
+        {
+          "name": "2FA Setup — Get QR Code",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/auth/2fa/setup/",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "Returns a QR code image (base64) and secret key. Scan with Google Authenticator or Authy."
+          }
+        },
+        {
+          "name": "2FA Setup — Verify and Enable",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/2fa/setup/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"123456\"\n}"
+            },
+            "description": "Verify the 6-digit TOTP code from your authenticator app to enable 2FA."
+          }
+        },
+        {
+          "name": "2FA Verify Code",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/2fa/verify/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"123456\"\n}"
+            },
+            "description": "Verify a 2FA code for an already-enabled account."
+          }
+        },
+        {
+          "name": "2FA Disable",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/2fa/disable/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"Test@1234\"\n}"
+            },
+            "description": "Disable 2FA. Requires current password for security."
           }
         }
       ]
@@ -71,18 +171,16 @@
       "name": "Reports",
       "item": [
         {
-          "name": "Submit Anonymous Report (no file)",
+          "name": "Submit Anonymous Report (JSON)",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/reports/",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"abuse_type\": \"physical\",\n  \"relationship\": \"self\",\n  \"county\": \"Nairobi\",\n  \"sub_county\": \"Westlands\",\n  \"description\": \"Repeated physical assault by a family member over the past three months.\",\n  \"phone\": \"+254712345678\"\n}"
+              "raw": "{\n  \"abuse_type\": \"physical\",\n  \"relationship\": \"self\",\n  \"county\": \"Nairobi\",\n  \"sub_county\": \"Westlands\",\n  \"description\": \"Repeated physical assault by family member over the past three months.\",\n  \"phone\": \"+254712345678\"\n}"
             },
-            "description": "No auth required. Returns a case reference code. If phone is provided, an SMS is sent via Africa's Talking."
+            "description": "No auth required. Returns case reference code. SMS sent via Africa's Talking if phone provided. Groq AI classifies and scores the report automatically."
           }
         },
         {
@@ -103,7 +201,7 @@
                 { "key": "evidence_file", "type": "file", "src": "" }
               ]
             },
-            "description": "Submit a report with an evidence photo. Use form-data. evidence_file must be set to File type in Postman. Photo is uploaded to Cloudinary."
+            "description": "Submit report with evidence photo. Change evidence_file type to File in Postman and select an image. Uploads to Cloudinary."
           }
         },
         {
@@ -114,7 +212,16 @@
             "header": [
               { "key": "Authorization", "value": "Bearer {{access_token}}" }
             ],
-            "description": "Returns report counts grouped by county. Requires JWT token. NGO and admin only in production."
+            "description": "Returns report counts grouped by county. NGO and county official access only."
+          }
+        },
+        {
+          "name": "Get Report Statistics (public)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/reports/stats/",
+            "header": [],
+            "description": "Returns total reports, breakdown by abuse type with percentages, top 10 counties, and 5 most recent reports."
           }
         }
       ]
@@ -128,21 +235,19 @@
             "method": "GET",
             "url": "{{base_url}}/api/organisations/",
             "header": [],
-            "description": "No auth required. Returns all verified organisations. Filter by county using ?county=Nairobi"
+            "description": "No auth required. Returns all verified NGOs and county government offices."
           }
         },
         {
-          "name": "List Organisations by County",
+          "name": "Filter Organisations by County",
           "request": {
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/organisations/?county=Nairobi",
-              "query": [
-                { "key": "county", "value": "Nairobi" }
-              ]
+              "query": [{ "key": "county", "value": "Nairobi" }]
             },
             "header": [],
-            "description": "Filter organisations by county name."
+            "description": "Filter by county name. Try: Nairobi, Mombasa, Kisumu, Meru."
           }
         },
         {
@@ -150,14 +255,12 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/organisations/register/",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Msaada Centre Kisumu\",\n  \"description\": \"Community support centre providing counselling and legal aid to GBV survivors in Kisumu County.\",\n  \"services\": \"counselling,legal aid,safe shelter,psychosocial support\",\n  \"county\": \"Kisumu\",\n  \"sub_county\": \"Kisumu Central\",\n  \"phone\": \"0721000222\",\n  \"email\": \"info@msaadacentre.org\",\n  \"website\": \"https://msaadacentre.org\",\n  \"latitude\": \"-0.1022\",\n  \"longitude\": \"34.7617\"\n}"
+              "raw": "{\n  \"name\": \"Msaada Centre Kisumu\",\n  \"org_type\": \"ngo\",\n  \"description\": \"Community support centre providing counselling and legal aid to GBV survivors in Kisumu County.\",\n  \"services\": \"counselling,legal aid,safe shelter,psychosocial support\",\n  \"county\": \"Kisumu\",\n  \"sub_county\": \"Kisumu Central\",\n  \"phone\": \"0721000222\",\n  \"email\": \"info@msaadacentre.org\",\n  \"website\": \"https://msaadacentre.org\",\n  \"latitude\": \"-0.1022\",\n  \"longitude\": \"34.7617\"\n}"
             },
-            "description": "Register a new organisation. Verified is false by default — admin must approve via Django admin panel."
+            "description": "Register new organisation. org_type options: ngo, county_govt, legal_aid, health, counselling, other. Verified=false by default — admin approves via Django admin."
           }
         },
         {
@@ -177,7 +280,29 @@
             "header": [
               { "key": "Authorization", "value": "Bearer {{access_token}}" }
             ],
-            "description": "Returns incident counts by county for heatmap rendering. Requires auth."
+            "description": "Returns incident counts by county as GeoJSON for heatmap rendering."
+          }
+        },
+        {
+          "name": "Organisation Impact Dashboard",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/1/impact/",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "Returns NGO impact stats: reports in county, total donations, content published, quiz completions. Replace 1 with organisation ID."
+          }
+        },
+        {
+          "name": "Bookmark Organisation",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/organisations/1/bookmark/",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "Toggle bookmark on an organisation. Replace 1 with organisation ID. Requires auth."
           }
         }
       ]
@@ -200,12 +325,10 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/content/?topic=legal",
-              "query": [
-                { "key": "topic", "value": "legal" }
-              ]
+              "query": [{ "key": "topic", "value": "legal" }]
             },
             "header": [],
-            "description": "Filter by topic. Options: recognise, legal, support, healthy, prevention"
+            "description": "Filter by topic. Options: recognise, legal, support, healthy, prevention."
           }
         },
         {
@@ -214,12 +337,19 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/content/?format=article",
-              "query": [
-                { "key": "format", "value": "article" }
-              ]
+              "query": [{ "key": "format", "value": "article" }]
             },
             "header": [],
-            "description": "Filter by format. Options: article, video, guide"
+            "description": "Filter by format. Options: article, video, guide."
+          }
+        },
+        {
+          "name": "Featured Content (public)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/content/featured/",
+            "header": [],
+            "description": "Returns 3 latest approved articles and 1 featured quiz. Powers the home page education section."
           }
         },
         {
@@ -235,21 +365,7 @@
               "mode": "raw",
               "raw": "{\n  \"title\": \"Understanding Financial Abuse in Kenyan Households\",\n  \"body\": \"Financial abuse is one of the most common but least recognised forms of GBV. It includes controlling all household money, preventing a partner from working, and taking their earnings by force.\",\n  \"format\": \"article\",\n  \"topic\": \"recognise\",\n  \"organisation\": 1\n}"
             },
-            "description": "Submit education content for admin approval. Requires JWT auth. Organisation must be verified."
-          }
-        },
-        {
-          "name": "YouTube Videos",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/content/videos/?q=GBV+awareness+Kenya",
-              "query": [
-                { "key": "q", "value": "GBV awareness Kenya" }
-              ]
-            },
-            "header": [],
-            "description": "Search YouTube for GBV awareness videos via YouTube Data API v3. Change the q parameter to search for different topics."
+            "description": "Submit education content for admin approval. Requires JWT auth."
           }
         }
       ]
@@ -263,7 +379,7 @@
             "method": "GET",
             "url": "{{base_url}}/api/quizzes/",
             "header": [],
-            "description": "No auth required. Returns all approved quizzes with questions."
+            "description": "No auth required. Returns all approved quizzes with questions and correct answers."
           }
         },
         {
@@ -272,7 +388,7 @@
             "method": "POST",
             "url": "{{base_url}}/api/quizzes/1/complete/",
             "header": [],
-            "description": "Anonymously log a quiz completion. Increments completion_count. Replace 1 with the quiz ID."
+            "description": "Anonymously log a quiz completion. Increments completion_count. Replace 1 with quiz ID."
           }
         }
       ]
@@ -285,14 +401,12 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/donations/initiate/",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"organisation_id\": 1,\n  \"amount\": 500,\n  \"email\": \"donor@example.com\",\n  \"callback_url\": \"http://localhost:8000/api/donations/verify/\"\n}"
             },
-            "description": "Initiates a Paystack payment. Returns a payment_url — open it in the browser to complete payment. Amount is in KES."
+            "description": "Initiates Paystack payment. Returns payment_url — open in browser to complete. Amount in KES."
           }
         },
         {
@@ -301,12 +415,54 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/donations/verify/?reference=paste_reference_here",
-              "query": [
-                { "key": "reference", "value": "paste_reference_here" }
-              ]
+              "query": [{ "key": "reference", "value": "paste_reference_here" }]
             },
             "header": [],
-            "description": "Verify a Paystack payment by reference. Updates donation status to completed in the database."
+            "description": "Verify Paystack payment by reference. Updates donation status to completed."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "County Summary CSV",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/analytics/county-summary/?days=30",
+              "query": [{ "key": "days", "value": "30" }]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "Download pandas-generated CSV with county, abuse_type, total_reports, flagged count and avg urgency score. Click Send and Download in Postman."
+          }
+        },
+        {
+          "name": "Daily Trend CSV",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/analytics/trend/?days=30",
+              "query": [{ "key": "days", "value": "30" }]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "Download daily trend CSV with date, total_reports and 7-day rolling average. Click Send and Download."
+          }
+        },
+        {
+          "name": "County Official Heatmap",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/analytics/county-official/",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "County-specific breakdown by sub-county and abuse type. Requires county_official or admin role."
           }
         }
       ]
@@ -319,29 +475,86 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/chat/",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"message\": \"Is it normal for my partner to check my phone every day?\",\n  \"history\": []\n}"
             },
-            "description": "Anonymous AI chatbot powered by Anthropic Claude. No auth required. Pass conversation history as an array for multi-turn conversations."
+            "description": "Anonymous AI chatbot powered by Groq LLaMA 3.3 70B. No auth required. Trauma-informed responses. Always surfaces GBV Hotline 1195 for crisis language."
           }
         },
         {
-          "name": "Chatbot with History",
+          "name": "Chatbot with Conversation History",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/chat/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"What should I do about it?\",\n  \"history\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Is it normal for my partner to check my phone every day?\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Constantly checking your phone without permission can be a sign of controlling behaviour...\"\n    }\n  ]\n}"
+            },
+            "description": "Multi-turn chatbot. Pass previous messages in history array to maintain context."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Search Everything",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/search/?q=Nairobi",
+              "query": [{ "key": "q", "value": "Nairobi" }]
+            },
+            "header": [],
+            "description": "Search across organisations, content and quizzes in one call. Returns three arrays."
+          }
+        },
+        {
+          "name": "Search by Service",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/search/?q=legal+aid",
+              "query": [{ "key": "q", "value": "legal aid" }]
+            },
+            "header": [],
+            "description": "Search for organisations offering a specific service."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/profile/",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "description": "Returns current user profile including role, county, bookmarked orgs and case refs."
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/api/profile/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"message\": \"What should I do about it?\",\n  \"history\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Is it normal for my partner to check my phone every day?\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Constantly checking your phone without permission can be a sign of controlling behaviour, which is a form of emotional abuse...\"\n    }\n  ]\n}"
+              "raw": "{\n  \"county\": \"Nairobi\",\n  \"bio\": \"Community health worker in Nairobi.\"\n}"
             },
-            "description": "Multi-turn chatbot conversation. Pass previous messages in the history array."
+            "description": "Update profile fields. Partial update — only send fields you want to change."
           }
         }
       ]
@@ -355,7 +568,7 @@
             "method": "GET",
             "url": "{{base_url}}/docs/",
             "header": [],
-            "description": "Open in browser to see full interactive Swagger documentation for all endpoints."
+            "description": "Open in browser for full interactive Swagger documentation."
           }
         },
         {

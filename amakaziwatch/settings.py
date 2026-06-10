@@ -139,8 +139,31 @@ SIMPLE_JWT = {
 # ── Swagger ───────────────────────────────────────────────────────────────────
 SPECTACULAR_SETTINGS = {
     'TITLE': 'AmakaziWatch API',
-    'DESCRIPTION': 'GBV Awareness, Reporting & Prevention Platform for Kenya',
+    'DESCRIPTION': 'Kenya first crowdsourced GBV awareness, reporting and prevention platform. Built with Django REST Framework, Groq AI, Africa Talking SMS, Cloudinary and Paystack.',
     'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': False,
+        'defaultModelsExpandDepth': -1,
+        'docExpansion': 'list',
+        'filter': True,
+        'showExtensions': True,
+        'showCommonExtensions': True,
+    },
+    'TAGS': [
+        {'name': 'Auth', 'description': 'Registration, login, JWT tokens, password reset and 2FA'},
+        {'name': 'Reports', 'description': 'Anonymous incident reporting and heatmap data'},
+        {'name': 'Organisations', 'description': 'NGO and county government directory'},
+        {'name': 'Content', 'description': 'Education articles, guides and quizzes'},
+        {'name': 'Donations', 'description': 'Paystack donations to verified organisations'},
+        {'name': 'Analytics', 'description': 'Pandas CSV reports for NGO donor reporting'},
+        {'name': 'Chat', 'description': 'Anonymous AI chatbot powered by Groq LLaMA'},
+        {'name': 'Search', 'description': 'Search across organisations, content and quizzes'},
+        {'name': 'Profile', 'description': 'User profile and bookmarks'},
+    ],
 }
 
 # ── CORS ──────────────────────────────────────────────────────────────────────

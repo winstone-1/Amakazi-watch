@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'organisations',
     'content',
     'api',
+    'subscriptions',
     'django_otp',
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_static',

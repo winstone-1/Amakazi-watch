@@ -849,9 +849,11 @@ class TwoFactorSetupView(APIView):
     def get(self, request):
         from django_otp.plugins.otp_totp.models import TOTPDevice
         import qrcode
-        import qrcode.image.svg
         from io import BytesIO
         import base64
+
+        # Delete any unconfirmed device first
+        TOTPDevice.objects.filter(user=request.user, confirmed=False).delete()
 
         device, created = TOTPDevice.objects.get_or_create(
             user=request.user,
@@ -860,20 +862,37 @@ class TwoFactorSetupView(APIView):
         )
 
         if device.confirmed:
-            return Response({"message": "2FA is already enabled for this account."})
+            return Response({
+                "message": "2FA is already enabled.",
+                "enabled": True
+            })
 
-        config_url = device.config_url
+        # Generate TOTP URI for authenticator apps
+        totp_uri = device.config_url
 
-        qr = qrcode.make(config_url)
+        # Generate QR code
+        qr = qrcode.make(totp_uri)
         buffer = BytesIO()
         qr.save(buffer, format="PNG")
         qr_base64 = base64.b64encode(buffer.getvalue()).decode()
 
+        # Generate manual entry code (base32 secret)
+        import base64 as b64
+        secret_bytes = bytes.fromhex(device.key)
+        totp_secret = b64.b32encode(secret_bytes).decode().rstrip("=")
+
         return Response({
-            "config_url": config_url,
+            "enabled":    False,
+            "totp_uri":   totp_uri,
+            "totp_secret": totp_secret,
             "qr_code":    f"data:image/png;base64,{qr_base64}",
-            "secret":     device.key,
-            "message":    "Scan the QR code with Google Authenticator or Authy, then verify with a code."
+            "instructions": [
+                "1. Open Google Authenticator or Authy on your phone",
+                "2. Tap + and choose Scan QR code",
+                "3. Scan the QR code above",
+                "4. Enter the 6-digit code shown in the app to verify",
+                "Alternatively enter the secret key manually in your authenticator app"
+            ]
         })
 
     def post(self, request):

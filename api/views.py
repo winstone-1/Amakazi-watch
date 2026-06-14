@@ -1370,3 +1370,115 @@ class VoiceReportListView(APIView):
             "transcript":   r.transcript,
             "created_at":   r.created_at,
         } for r in reports])
+
+
+# -- WhatsApp Bot -------------------------------------------------------------
+class WhatsAppWebhookView(APIView):
+    """
+    Africa's Talking WhatsApp incoming message webhook.
+    Handles commands: REPORT, HELP, FIND, STATUS <ref_code>
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        from reports.utils.whatsapp import send_whatsapp
+        from reports.utils.sms import send_case_reference_sms
+        import random
+        import string
+
+        phone   = request.data.get("from", "")
+        message = request.data.get("text", "").strip().upper()
+
+        if not phone or not message:
+            return Response({"error": "from and text required"}, status=400)
+
+        # HELP command
+        if message in ["HELP", "HI", "HELLO", "START"]:
+            reply = (
+                "Welcome to AmakaziWatch.\n\n"
+                "Commands:\n"
+                "REPORT — File an anonymous report\n"
+                "FIND <county> — Find help near you\n"
+                "STATUS <ref_code> — Track your case\n"
+                "HOTLINE — Emergency numbers\n\n"
+                "All conversations are anonymous."
+            )
+            send_whatsapp(phone, reply)
+            return Response({"message": "Help sent"})
+
+        # HOTLINE command
+        if message == "HOTLINE":
+            reply = (
+                "Kenya GBV Emergency Numbers:\n"
+                "GBV Hotline: 1195\n"
+                "Childline: 116\n"
+                "Police: 999\n"
+                "FIDA Kenya: 0202721784\n"
+                "GVRC Nairobi: 0800720500"
+            )
+            send_whatsapp(phone, reply)
+            return Response({"message": "Hotline sent"})
+
+        # REPORT command
+        if message.startswith("REPORT"):
+            ref = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            from reports.models import IncidentReport
+            import hashlib
+            IncidentReport.objects.create(
+                abuse_type="physical",
+                relationship="self",
+                county="Unknown",
+                description=f"WhatsApp report from {hashlib.sha256(phone.encode()).hexdigest()[:8]}",
+                sms_ref_code=ref,
+            )
+            reply = (
+                f"Report received. Your case reference: {ref}\n"
+                "Reply with more details:\n"
+                "COUNTY <your county>\n"
+                "TYPE physical/emotional/financial/sexual/digital\n"
+                "DETAIL <what happened>\n\n"
+                "You are not alone. GBV Hotline: 1195"
+            )
+            send_whatsapp(phone, reply)
+            return Response({"message": "Report created", "ref": ref})
+
+        # FIND command
+        if message.startswith("FIND"):
+            parts = message.split(" ", 1)
+            county = parts[1] if len(parts) > 1 else ""
+            from organisations.models import Organisation
+            orgs = Organisation.objects.filter(
+                verified=True,
+                county__icontains=county
+            )[:3]
+            if orgs:
+                lines = [f"Help near {county}:"]
+                for org in orgs:
+                    lines.append(f"\n{org.name}\n{org.phone or org.email}")
+                reply = "\n".join(lines)
+            else:
+                reply = f"No verified organisations found in {county}. Try a nearby county or call 1195."
+            send_whatsapp(phone, reply)
+            return Response({"message": "Orgs sent"})
+
+        # STATUS command
+        if message.startswith("STATUS"):
+            parts = message.split(" ", 1)
+            ref = parts[1].strip() if len(parts) > 1 else ""
+            from reports.models import IncidentReport, CaseUpdate
+            try:
+                report = IncidentReport.objects.get(sms_ref_code=ref)
+                updates = CaseUpdate.objects.filter(ref_code=ref)
+                lines = [f"Case {ref}:", f"Type: {report.abuse_type}", f"County: {report.county}"]
+                if updates.exists():
+                    lines.append(f"Updates: {updates.count()}")
+                    lines.append(f"Latest: {updates.first().update_type}")
+                reply = "\n".join(lines)
+            except IncidentReport.DoesNotExist:
+                reply = f"Case {ref} not found. Check your reference code."
+            send_whatsapp(phone, reply)
+            return Response({"message": "Status sent"})
+
+        # Default
+        send_whatsapp(phone, "Command not recognised. Reply HELP for available commands.")
+        return Response({"message": "Default reply sent"})

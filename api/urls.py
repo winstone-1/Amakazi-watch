@@ -64,6 +64,9 @@ urlpatterns = [
     # Case Tracking
     path("cases/<str:ref_code>/", views.CaseTrackingView.as_view(), name="case-tracking"),
 
+    # WhatsApp Bot
+    path("whatsapp/webhook/", views.WhatsAppWebhookView.as_view(), name="whatsapp-webhook"),
+
     # Voice Reporting
     path("voice/callback/", views.VoiceReportCallbackView.as_view(), name="voice-callback"),
     path("voice/reports/", views.VoiceReportListView.as_view(), name="voice-reports"),

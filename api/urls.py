@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from . import views
@@ -18,6 +18,18 @@ TokenRefreshView = extend_schema_view(
 )(TokenRefreshView)
 
 urlpatterns = [
+
+    # Safety Features
+    path('safety/', include('safety.urls')),
+    path('vault/', include('vault.urls')),
+    path('peer/', include('peer_support.urls')),
+    path('legal/', include('legal_bot.urls')),
+    path('org/', include('org_coordination.urls')),
+    path('campaigns/', include('campaigns.urls')),
+    path('workshops/', include('workshops.urls')),
+    path('tips/', include('tips.urls')),
+    path('scorecard/', include('county_scorecard.urls')),
+
     # Reports
     path("reports/", views.ReportCreateView.as_view(), name="report-create"),
     path("reports/heatmap/", views.HeatmapView.as_view(), name="heatmap"),

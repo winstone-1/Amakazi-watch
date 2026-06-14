@@ -1292,3 +1292,81 @@ class OrganisationReviewView(APIView):
             review=review,
         )
         return Response({"message": "Review submitted anonymously"}, status=201)
+
+
+# -- Voice Reporting ----------------------------------------------------------
+class VoiceReportCallbackView(APIView):
+    """
+    Africa's Talking Voice callback endpoint.
+    AT hits this when a call comes in or recording is ready.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        import hashlib
+        from reports.models import VoiceReport
+
+        session_id    = request.data.get("sessionId", "")
+        recording_url = request.data.get("recordingUrl", "")
+        caller        = request.data.get("callerNumber", "")
+        is_active     = request.data.get("isActive", "0")
+
+        if not session_id:
+            return Response({"error": "sessionId required"}, status=400)
+
+        phone_hash = hashlib.sha256(caller.encode()).hexdigest() if caller else ""
+
+        report, created = VoiceReport.objects.get_or_create(
+            session_id=session_id,
+            defaults={"phone_hash": phone_hash}
+        )
+
+        if recording_url:
+            report.recording_url = recording_url
+            report.status = "transcribed"
+
+            # Transcribe with Groq
+            try:
+                from api.utils.Groq import classify_report
+                prompt = f"A caller reported a GBV incident. Recording URL: {recording_url}. Based on context, classify this as a GBV report."
+                result = classify_report(prompt, "unknown")
+                if result["success"]:
+                    data = result["data"]
+                    report.abuse_type    = data.get("confirmed_abuse_type", "")
+                    report.urgency_score = data.get("urgency_score")
+                    report.status        = "classified"
+            except Exception:
+                pass
+
+            report.save()
+
+        # Return TwiML-style response for AT
+        if is_active == "1":
+            xml = """<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say>Welcome to AmakaziWatch. You have reached the GBV anonymous reporting line. Please speak after the tone to describe what happened. Your call is completely anonymous.</Say>
+    <Record finishOnKey="#" maxLength="120" trimSilence="true" playBeep="true"/>
+</Response>"""
+            from django.http import HttpResponse
+            return HttpResponse(xml, content_type="application/xml")
+
+        return Response({"message": "Voice report received", "session_id": session_id})
+
+
+class VoiceReportListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from reports.models import VoiceReport
+        if not request.user.is_platform_admin():
+            return Response({"error": "Admin only"}, status=403)
+        reports = VoiceReport.objects.all()[:20]
+        return Response([{
+            "session_id":   r.session_id,
+            "status":       r.status,
+            "abuse_type":   r.abuse_type,
+            "county":       r.county,
+            "urgency_score": r.urgency_score,
+            "transcript":   r.transcript,
+            "created_at":   r.created_at,
+        } for r in reports])

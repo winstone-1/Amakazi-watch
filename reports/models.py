@@ -56,3 +56,24 @@ class CaseUpdate(models.Model):
 
     def __str__(self):
         return f"{self.ref_code} — {self.update_type}"
+
+
+class VoiceReport(models.Model):
+    class Status(models.TextChoices):
+        PENDING     = "pending",     "Pending Transcription"
+        TRANSCRIBED = "transcribed", "Transcribed"
+        CLASSIFIED  = "classified",  "AI Classified"
+        FAILED      = "failed",      "Failed"
+
+    session_id      = models.CharField(max_length=100, unique=True)
+    phone_hash      = models.CharField(max_length=100)
+    recording_url   = models.URLField(blank=True)
+    transcript      = models.TextField(blank=True)
+    abuse_type      = models.CharField(max_length=20, blank=True)
+    county          = models.CharField(max_length=100, blank=True)
+    urgency_score   = models.IntegerField(null=True, blank=True)
+    status          = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    created_at      = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Voice Report {self.session_id} — {self.status}"

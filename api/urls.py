@@ -64,6 +64,10 @@ urlpatterns = [
     # Case Tracking
     path("cases/<str:ref_code>/", views.CaseTrackingView.as_view(), name="case-tracking"),
 
+    # Voice Reporting
+    path("voice/callback/", views.VoiceReportCallbackView.as_view(), name="voice-callback"),
+    path("voice/reports/", views.VoiceReportListView.as_view(), name="voice-reports"),
+
     # Ratings and Reviews
     path("content/<int:pk>/rate/", views.ContentRatingView.as_view(), name="content-rate"),
     path("organisations/<int:pk>/reviews/", views.OrganisationReviewView.as_view(), name="org-reviews"),

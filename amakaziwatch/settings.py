@@ -203,6 +203,7 @@ SOCIALACCOUNT_PROVIDERS = {
 AT_API_KEY   = os.getenv('AT_API_KEY')
 AT_USERNAME  = os.getenv('AT_USERNAME', 'sandbox')
 AT_SENDER_ID = os.getenv('AT_SENDER_ID', 'AmakaziWatch')
+AT_CALLER_ID = os.getenv('AT_CALLER_ID', '')
 
 # ── M-Pesa Daraja ─────────────────────────────────────────────────────────────
 MPESA_CONSUMER_KEY    = os.getenv('MPESA_CONSUMER_KEY')

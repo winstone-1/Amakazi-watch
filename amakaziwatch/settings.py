@@ -36,6 +36,15 @@ INSTALLED_APPS = [
     'organisations',
     'content',
     'api',
+    'safety',
+    'vault',
+    'peer_support',
+    'legal_bot',
+    'org_coordination',
+    'campaigns',
+    'workshops',
+    'tips',
+    'county_scorecard',
     'subscriptions',
     'intelligence',
     'notifications',
@@ -246,3 +255,8 @@ CACHES = {
     }
 }
 CACHE_TTL = 60 * 5  # 5 minutes
+
+
+# Media files for vault
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/secure_vault/'

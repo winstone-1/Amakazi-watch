@@ -1044,3 +1044,60 @@ class EmergencyContactDeleteView(APIView):
             return Response({"message": "Contact removed"})
         except EmergencyContact.DoesNotExist:
             return Response({"error": "Contact not found"}, status=404)
+
+
+# -- Case Tracking ------------------------------------------------------------
+class CaseTrackingView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, ref_code):
+        from reports.models import IncidentReport, CaseUpdate
+        try:
+            report = IncidentReport.objects.get(sms_ref_code=ref_code)
+        except IncidentReport.DoesNotExist:
+            return Response({"error": "Case reference not found"}, status=404)
+
+        updates = CaseUpdate.objects.filter(ref_code=ref_code)
+        return Response({
+            "ref_code":    ref_code,
+            "abuse_type":  report.abuse_type,
+            "county":      report.county,
+            "submitted_at": report.created_at,
+            "urgency_score": report.urgency_score,
+            "updates": [
+                {
+                    "type": u.update_type,
+                    "notes": u.notes,
+                    "date": u.created_at
+                } for u in updates
+            ]
+        })
+
+    def post(self, request, ref_code):
+        from reports.models import IncidentReport, CaseUpdate
+        try:
+            IncidentReport.objects.get(sms_ref_code=ref_code)
+        except IncidentReport.DoesNotExist:
+            return Response({"error": "Case reference not found"}, status=404)
+
+        update_type = request.data.get("update_type")
+        notes = request.data.get("notes", "")
+
+        if not update_type:
+            return Response({"error": "update_type is required"}, status=400)
+
+        valid_types = [c[0] for c in CaseUpdate.UpdateType.choices]
+        if update_type not in valid_types:
+            return Response({"error": f"Invalid update_type. Choose from: {valid_types}"}, status=400)
+
+        update = CaseUpdate.objects.create(
+            ref_code=ref_code,
+            update_type=update_type,
+            notes=notes,
+        )
+        return Response({
+            "message":     "Case update recorded",
+            "ref_code":    ref_code,
+            "update_type": update.update_type,
+            "created_at":  update.created_at,
+        }, status=201)

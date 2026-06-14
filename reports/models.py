@@ -34,3 +34,25 @@ class IncidentReport(models.Model):
 
     def __str__(self):
         return f"{self.abuse_type} — {self.county} — {self.sms_ref_code}"
+
+
+class CaseUpdate(models.Model):
+    class UpdateType(models.TextChoices):
+        FOLLOW_UP   = "follow_up",   "Follow Up"
+        POLICE      = "police",      "Reported to Police"
+        LEGAL       = "legal",       "Legal Aid Contacted"
+        MEDICAL     = "medical",     "Medical Attention Received"
+        SHELTER     = "shelter",     "Safe Shelter Found"
+        RESOLVED    = "resolved",    "Case Resolved"
+        OTHER       = "other",       "Other"
+
+    ref_code    = models.CharField(max_length=12)
+    update_type = models.CharField(max_length=20, choices=UpdateType.choices)
+    notes       = models.TextField(blank=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.ref_code} — {self.update_type}"

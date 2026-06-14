@@ -67,3 +67,14 @@ class Referral(models.Model):
 
     def __str__(self):
         return f"{self.from_org.name} to {self.to_org.name} [{self.ref_code}] — {self.status}"
+
+
+class OrganisationReview(models.Model):
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="reviews")
+    rating       = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    review       = models.TextField()
+    helpful      = models.BooleanField(default=False)
+    created_at   = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.organisation.name} — {self.rating}/5"

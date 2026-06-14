@@ -1215,3 +1215,80 @@ class ReferralListView(APIView):
             "notes":     r.notes,
             "created_at": r.created_at,
         } for r in referrals])
+
+
+# -- Content Rating -----------------------------------------------------------
+class ContentRatingView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, pk):
+        from content.models import EducationContent, ContentRating
+        from django.db.models import Avg
+
+        rating = request.data.get("rating")
+        if not rating or int(rating) not in range(1, 6):
+            return Response({"error": "rating must be 1-5"}, status=400)
+
+        try:
+            content = EducationContent.objects.get(pk=pk, approved=True)
+        except EducationContent.DoesNotExist:
+            return Response({"error": "Content not found"}, status=404)
+
+        ContentRating.objects.create(content=content, rating=int(rating))
+        avg = ContentRating.objects.filter(content=content).aggregate(avg=Avg("rating"))["avg"]
+
+        return Response({
+            "message":    "Rating submitted",
+            "avg_rating": round(avg, 2),
+            "total_ratings": ContentRating.objects.filter(content=content).count()
+        })
+
+
+# -- Organisation Reviews -----------------------------------------------------
+class OrganisationReviewView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, pk):
+        from organisations.models import Organisation, OrganisationReview
+        from django.db.models import Avg
+
+        try:
+            org = Organisation.objects.get(pk=pk, verified=True)
+        except Organisation.DoesNotExist:
+            return Response({"error": "Organisation not found"}, status=404)
+
+        reviews = OrganisationReview.objects.filter(organisation=org)
+        avg = reviews.aggregate(avg=Avg("rating"))["avg"]
+
+        return Response({
+            "organisation": org.name,
+            "avg_rating":   round(avg, 2) if avg else None,
+            "total_reviews": reviews.count(),
+            "reviews": [{
+                "rating":     r.rating,
+                "review":     r.review,
+                "helpful":    r.helpful,
+                "created_at": r.created_at,
+            } for r in reviews[:10]]
+        })
+
+    def post(self, request, pk):
+        from organisations.models import Organisation, OrganisationReview
+
+        rating = request.data.get("rating")
+        review = request.data.get("review", "")
+
+        if not rating or int(rating) not in range(1, 6):
+            return Response({"error": "rating must be 1-5"}, status=400)
+
+        try:
+            org = Organisation.objects.get(pk=pk, verified=True)
+        except Organisation.DoesNotExist:
+            return Response({"error": "Organisation not found"}, status=404)
+
+        OrganisationReview.objects.create(
+            organisation=org,
+            rating=int(rating),
+            review=review,
+        )
+        return Response({"message": "Review submitted anonymously"}, status=201)

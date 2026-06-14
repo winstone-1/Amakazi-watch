@@ -43,3 +43,12 @@ class Quiz(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ContentRating(models.Model):
+    content    = models.ForeignKey(EducationContent, on_delete=models.CASCADE, related_name="ratings")
+    rating     = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.content.title} — {self.rating}/5"

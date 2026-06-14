@@ -64,6 +64,10 @@ urlpatterns = [
     # Case Tracking
     path("cases/<str:ref_code>/", views.CaseTrackingView.as_view(), name="case-tracking"),
 
+    # Ratings and Reviews
+    path("content/<int:pk>/rate/", views.ContentRatingView.as_view(), name="content-rate"),
+    path("organisations/<int:pk>/reviews/", views.OrganisationReviewView.as_view(), name="org-reviews"),
+
     # Panic Button
     path("panic/contacts/", views.EmergencyContactListView.as_view(), name="emergency-contacts"),
     path("panic/contacts/<int:pk>/", views.EmergencyContactDeleteView.as_view(), name="emergency-contact-delete"),

@@ -67,6 +67,9 @@ urlpatterns = [
     # Bulk SMS
     path("sms/blast/", views.BulkSMSView.as_view(), name="sms-blast"),
 
+    # Language
+    path("language/", views.LanguageSwitchView.as_view(), name="language-switch"),
+
     # USSD
     path("ussd/", views.USSDView.as_view(), name="ussd"),
 

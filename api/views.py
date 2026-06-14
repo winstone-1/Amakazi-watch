@@ -1513,45 +1513,33 @@ class USSDView(APIView):
         # Level 0 — Main menu
         if text == "":
             response = (
-                "CON Welcome to AmakaziWatch
-"
-                "1. Report incident
-"
-                "2. Find help near me
-"
-                "3. Track my case
-"
-                "4. Emergency numbers"
-            )
-
+    "CON Welcome to AmakaziWatch\n"
+    "1. Report incident\n"
+    "2. Find help near me\n"
+    "3. Track my case\n"
+    "4. Emergency numbers"
+)
         # Level 1
         elif text == "1":
             response = (
-                "CON Select abuse type:
-"
-                "1. Physical
-"
-                "2. Emotional
-"
-                "3. Financial
-"
-                "4. Sexual
-"
+
+                "CON Select abuse type:\n"
+
+                "1. Physical\n"
+
+                "2. Emotional\n"
+                "3. Financial\n"
+                "4. Sexual\n"
                 "5. Digital"
             )
 
         elif text == "2":
             response = (
-                "CON Select your county:
-"
-                "1. Nairobi
-"
-                "2. Mombasa
-"
-                "3. Kisumu
-"
-                "4. Nakuru
-"
+                "CON Select your county:\n"
+                "1. Nairobi\n"
+                "2. Mombasa\n"
+                "3. Kisumu\n"
+                "4. Nakuru\n"
                 "5. Other"
             )
 
@@ -1560,14 +1548,10 @@ class USSDView(APIView):
 
         elif text == "4":
             response = (
-                "END Emergency Numbers:
-"
-                "GBV Hotline: 1195
-"
-                "Childline: 116
-"
-                "Police: 999
-"
+                "END Emergency Numbers:\n"
+                "GBV Hotline: 1195\n"
+                "Childline: 116\n"
+                "Police: 999\n"
                 "FIDA Kenya: 0202721784"
             )
 
@@ -1576,16 +1560,11 @@ class USSDView(APIView):
             abuse_map = {"1": "physical", "2": "emotional", "3": "financial", "4": "sexual", "5": "digital"}
             abuse = abuse_map.get(parts[1], "other")
             response = (
-                "CON Select your county:
-"
-                "1. Nairobi
-"
-                "2. Mombasa
-"
-                "3. Kisumu
-"
-                "4. Nakuru
-"
+                "CON Select your county:\n"
+                "1. Nairobi\n"
+                "2. Mombasa\n"
+                "3. Kisumu\n"
+                "4. Nakuru\n"
                 "5. Other"
             )
 
@@ -1701,3 +1680,33 @@ class BulkSMSView(APIView):
             })
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+
+# -- Language Switcher --------------------------------------------------------
+class LanguageSwitchView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        from django.utils import translation
+        from django.utils.translation import activate
+
+        lang = request.data.get("language", "en")
+        supported = ["en", "sw"]
+
+        if lang not in supported:
+            return Response({
+                "error": f"Unsupported language. Choose from: {supported}"
+            }, status=400)
+
+        activate(lang)
+        request.session["_language"] = lang
+
+        labels = {
+            "en": "English",
+            "sw": "Swahili — Kiswahili"
+        }
+
+        return Response({
+            "message": f"Language switched to {labels[lang]}",
+            "language": lang
+        })

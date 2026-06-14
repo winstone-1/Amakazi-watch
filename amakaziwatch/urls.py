@@ -6,6 +6,7 @@ from reports.views import home
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
+    path("rosetta/", include("rosetta.urls")),
     path("accounts/", include("allauth.urls")),
     path("api/", include("api.urls")),
     path("api/subscriptions/", include("subscriptions.urls")),

@@ -290,3 +290,55 @@ def test_2fa_disable_wrong_password(auth_client):
         "password": "wrongpassword"
     }, format="json")
     assert response.status_code == 400
+
+
+def test_safety_timer_start(auth_client):
+    response = auth_client.post('/api/safety/timer/start/', {
+        'duration_minutes': 30
+    })
+    assert response.status_code == 201
+
+def test_safe_word_create(auth_client):
+    response = auth_client.post('/api/safety/safe-word/', {
+        'code_word': 'blueberry'
+    })
+    assert response.status_code == 201
+
+def test_risk_assessment(auth_client):
+    response = auth_client.post('/api/safety/risk-assessment/', {
+        'answers': {'q1': True, 'q2': False}
+    })
+    assert response.status_code == 201
+
+def test_escape_plan(auth_client):
+    response = auth_client.post('/api/safety/escape-plan/', {
+        'county': 'Nairobi',
+        'has_children': True
+    })
+    assert response.status_code == 201
+
+def test_upload_evidence(auth_client):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    file = SimpleUploadedFile("test.jpg", b"content", content_type="image/jpeg")
+    response = auth_client.post('/api/vault/documents/', {
+        'file': file,
+        'file_type': 'image',
+        'description': 'Test evidence',
+        'incident_date': '2024-01-15T10:00:00'
+    }, format='multipart')
+    assert response.status_code == 201
+
+def test_legal_bot_ask(client):
+    response = client.post('/api/legal/ask/', {
+        'question': 'What are my rights?',
+        'session_id': 'test123'
+    })
+    assert response.status_code == 200
+
+def test_privacy_policy(client):
+    response = client.get('/api/privacy-policy/current/')
+    assert response.status_code == 200
+
+def test_county_rankings(client):
+    response = client.get('/api/scorecard/rankings/')
+    assert response.status_code == 200

@@ -1108,7 +1108,7 @@ class ReferralCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        from organisations.referrals import Referral
+        from organisations.models import Referral
         from organisations.models import Organisation
 
         from_org_id = request.data.get("from_org")
@@ -1145,7 +1145,7 @@ class ReferralUpdateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def patch(self, request, pk):
-        from organisations.referrals import Referral
+        from organisations.models import Referral
 
         try:
             referral = Referral.objects.get(pk=pk)
@@ -1175,7 +1175,7 @@ class ReferralListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        from organisations.referrals import Referral
+        from organisations.models import Referral
 
         org_id = request.query_params.get("org_id")
         direction = request.query_params.get("direction", "both")

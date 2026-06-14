@@ -64,6 +64,9 @@ urlpatterns = [
     # Case Tracking
     path("cases/<str:ref_code>/", views.CaseTrackingView.as_view(), name="case-tracking"),
 
+    # Bulk SMS
+    path("sms/blast/", views.BulkSMSView.as_view(), name="sms-blast"),
+
     # USSD
     path("ussd/", views.USSDView.as_view(), name="ussd"),
 

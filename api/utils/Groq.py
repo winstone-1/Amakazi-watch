@@ -96,3 +96,50 @@ Flag for review if: children involved, immediate danger, or urgency >= 4."""
         return {"success": True, "data": result}
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+
+def check_duplicate(new_description, county, abuse_type):
+    """
+    Compare new report against recent reports in same county.
+    Returns duplicate likelihood score.
+    """
+    from reports.models import IncidentReport
+    from django.utils import timezone
+    from datetime import timedelta
+
+    recent = IncidentReport.objects.filter(
+        county__icontains=county,
+        abuse_type=abuse_type,
+        created_at__gte=timezone.now() - timedelta(hours=24)
+    ).values_list("description", flat=True)[:5]
+
+    if not recent:
+        return {"is_duplicate": False, "confidence": 0}
+
+    client = Groq(api_key=settings.GROQ_API_KEY)
+    recent_text = "\n---\n".join(recent)
+
+    prompt = f"""Compare this new GBV report with recent reports from the same county.
+New report: {new_description}
+
+Recent reports:
+{recent_text}
+
+Respond ONLY with JSON:
+{{
+  "is_duplicate": <true or false>,
+  "confidence": <0-100>,
+  "reason": "<brief reason>"
+}}"""
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=100,
+            temperature=0.1,
+        )
+        import json
+        return json.loads(response.choices[0].message.content.strip())
+    except Exception:
+        return {"is_duplicate": False, "confidence": 0}

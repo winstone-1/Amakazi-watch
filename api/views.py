@@ -80,6 +80,14 @@ class ReportCreateView(generics.CreateAPIView):
         )
         check_report_spike(report.county)
 
+        # Deduplication check
+        if report.description:
+            from api.utils.Groq import check_duplicate
+            dup = check_duplicate(report.description, report.county, report.abuse_type)
+            if dup.get("is_duplicate") and dup.get("confidence", 0) > 80:
+                report.ai_classification = f"possible_duplicate:{dup.get('confidence')}%"
+                report.save()
+
         # AI classification
         if report.description:
             from api.utils.Groq import classify_report
@@ -1644,3 +1652,52 @@ class USSDView(APIView):
 
         from django.http import HttpResponse
         return HttpResponse(response, content_type="text/plain")
+
+
+# -- Bulk SMS Blast -----------------------------------------------------------
+class BulkSMSView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_platform_admin():
+            return Response({"error": "Admin only"}, status=403)
+
+        message = request.data.get("message")
+        county  = request.data.get("county")
+        phones  = request.data.get("phones", [])
+
+        if not message:
+            return Response({"error": "message is required"}, status=400)
+
+        if not phones:
+            return Response({"error": "phones list is required"}, status=400)
+
+        if len(message) > 160:
+            return Response({"error": "Message must be under 160 characters"}, status=400)
+
+        from reports.utils.sms import initialize_at
+        sms = initialize_at()
+
+        try:
+            response = sms.send(
+                message=f"AmakaziWatch: {message}",
+                recipients=phones,
+            )
+            from notifications.utils import audit
+            audit(
+                user=request.user,
+                action="bulk_sms_sent",
+                details={
+                    "message":    message,
+                    "county":     county,
+                    "recipients": len(phones)
+                },
+                request=request,
+            )
+            return Response({
+                "message":    f"SMS sent to {len(phones)} recipients",
+                "county":     county,
+                "response":   str(response)
+            })
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)

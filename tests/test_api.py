@@ -10,8 +10,7 @@ def api_client():
     return APIClient()
 
 @pytest.fixture
-@ pytest.mark.django_db
-def test_user():
+def test_user(db):
     return User.objects.create_user(
         username='testuser',
         email='test@test.com',
@@ -19,33 +18,28 @@ def test_user():
     )
 
 @pytest.fixture
-@ pytest.mark.django_db
 def auth_client(api_client, test_user):
     api_client.force_authenticate(user=test_user)
     return api_client
 
-@ pytest.mark.django_db
 def test_safety_timer_start(auth_client):
     response = auth_client.post('/api/safety/timer/start/', {
         'duration_minutes': 30
     })
     assert response.status_code in [200, 201, 404]
 
-@ pytest.mark.django_db
 def test_safe_word_create(auth_client):
     response = auth_client.post('/api/safety/safe-word/', {
         'code_word': 'blueberry'
     })
     assert response.status_code in [200, 201, 404]
 
-@ pytest.mark.django_db
 def test_risk_assessment(auth_client):
     response = auth_client.post('/api/safety/risk-assessment/', {
         'answers': {'q1': True, 'q2': False}
     })
     assert response.status_code in [200, 201, 404]
 
-@ pytest.mark.django_db
 def test_escape_plan(auth_client):
     response = auth_client.post('/api/safety/escape-plan/', {
         'county': 'Nairobi',
@@ -53,7 +47,6 @@ def test_escape_plan(auth_client):
     })
     assert response.status_code in [200, 201, 404]
 
-@ pytest.mark.django_db
 def test_upload_evidence(auth_client):
     file = SimpleUploadedFile("test.jpg", b"content", content_type="image/jpeg")
     response = auth_client.post('/api/vault/documents/', {
@@ -64,7 +57,6 @@ def test_upload_evidence(auth_client):
     }, format='multipart')
     assert response.status_code in [200, 201, 404]
 
-@ pytest.mark.django_db
 def test_legal_bot_ask(api_client):
     response = api_client.post('/api/legal/ask/', {
         'question': 'What are my rights?',
@@ -72,12 +64,10 @@ def test_legal_bot_ask(api_client):
     })
     assert response.status_code in [200, 400, 404]
 
-@ pytest.mark.django_db
 def test_privacy_policy(api_client):
     response = api_client.get('/api/privacy-policy/current/')
     assert response.status_code in [200, 404]
 
-@ pytest.mark.django_db
 def test_county_rankings(api_client):
     response = api_client.get('/api/scorecard/rankings/')
     assert response.status_code in [200, 404]

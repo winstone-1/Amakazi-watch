@@ -56,6 +56,11 @@ urlpatterns = [
     # Profile
     path("profile/", views.ProfileView.as_view(), name="profile"),
 
+    # Referrals
+    path("referrals/", views.ReferralCreateView.as_view(), name="referral-create"),
+    path("referrals/list/", views.ReferralListView.as_view(), name="referral-list"),
+    path("referrals/<int:pk>/", views.ReferralUpdateView.as_view(), name="referral-update"),
+
     # Case Tracking
     path("cases/<str:ref_code>/", views.CaseTrackingView.as_view(), name="case-tracking"),
 

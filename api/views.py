@@ -1101,3 +1101,105 @@ class CaseTrackingView(APIView):
             "update_type": update.update_type,
             "created_at":  update.created_at,
         }, status=201)
+
+
+# -- Referral Network ---------------------------------------------------------
+class ReferralCreateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        from organisations.referrals import Referral
+        from organisations.models import Organisation
+
+        from_org_id = request.data.get("from_org")
+        to_org_id   = request.data.get("to_org")
+        ref_code    = request.data.get("ref_code")
+        reason      = request.data.get("reason")
+
+        if not all([from_org_id, to_org_id, ref_code, reason]):
+            return Response({"error": "from_org, to_org, ref_code and reason are required"}, status=400)
+
+        if from_org_id == to_org_id:
+            return Response({"error": "Cannot refer to the same organisation"}, status=400)
+
+        try:
+            from_org = Organisation.objects.get(pk=from_org_id, verified=True)
+            to_org   = Organisation.objects.get(pk=to_org_id, verified=True)
+        except Organisation.DoesNotExist:
+            return Response({"error": "Organisation not found"}, status=404)
+
+        referral = Referral.objects.create(
+            from_org=from_org,
+            to_org=to_org,
+            ref_code=ref_code,
+            reason=reason,
+        )
+        return Response({
+            "message":    f"Case {ref_code} referred to {to_org.name}",
+            "referral_id": referral.id,
+            "status":     referral.status,
+        }, status=201)
+
+
+class ReferralUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request, pk):
+        from organisations.referrals import Referral
+
+        try:
+            referral = Referral.objects.get(pk=pk)
+        except Referral.DoesNotExist:
+            return Response({"error": "Referral not found"}, status=404)
+
+        status = request.data.get("status")
+        notes  = request.data.get("notes", "")
+
+        valid = [c[0] for c in Referral.Status.choices]
+        if status not in valid:
+            return Response({"error": f"Invalid status. Choose from: {valid}"}, status=400)
+
+        referral.status = status
+        referral.notes  = notes
+        referral.save()
+
+        return Response({
+            "message": f"Referral {pk} updated to {status}",
+            "referral_id": referral.id,
+            "status":  referral.status,
+            "notes":   referral.notes,
+        })
+
+
+class ReferralListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from organisations.referrals import Referral
+
+        org_id = request.query_params.get("org_id")
+        direction = request.query_params.get("direction", "both")
+
+        if not org_id:
+            return Response({"error": "org_id is required"}, status=400)
+
+        if direction == "sent":
+            referrals = Referral.objects.filter(from_org_id=org_id)
+        elif direction == "received":
+            referrals = Referral.objects.filter(to_org_id=org_id)
+        else:
+            from django.db.models import Q
+            referrals = Referral.objects.filter(
+                Q(from_org_id=org_id) | Q(to_org_id=org_id)
+            )
+
+        return Response([{
+            "id":        r.id,
+            "from_org":  r.from_org.name,
+            "to_org":    r.to_org.name,
+            "ref_code":  r.ref_code,
+            "reason":    r.reason,
+            "status":    r.status,
+            "notes":     r.notes,
+            "created_at": r.created_at,
+        } for r in referrals])

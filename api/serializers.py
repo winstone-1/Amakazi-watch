@@ -180,3 +180,16 @@ class EmergencyContactSerializer(serializers.ModelSerializer):
         model  = EmergencyContact
         fields = ["id", "name", "phone", "relation", "is_active", "created_at"]
         read_only_fields = ["created_at"]
+from rest_framework import serializers
+from .models import PrivacyPolicy, UserConsent
+
+class PrivacyPolicySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PrivacyPolicy
+        fields = ['id', 'version', 'content', 'effective_date', 'is_active']
+
+class UserConsentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserConsent
+        fields = ['id', 'policy_version', 'consent_given', 'created_at']
+        read_only_fields = ['user', 'ip_address', 'user_agent', 'created_at']

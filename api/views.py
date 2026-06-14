@@ -1710,3 +1710,61 @@ class LanguageSwitchView(APIView):
             "message": f"Language switched to {labels[lang]}",
             "language": lang
         })
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.utils import timezone
+from .models import PrivacyPolicy, UserConsent
+from .serializers import PrivacyPolicySerializer, UserConsentSerializer
+
+class PrivacyPolicyViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = PrivacyPolicySerializer
+    permission_classes = [permissions.AllowAny]
+    
+    def get_queryset(self):
+        return PrivacyPolicy.objects.filter(is_active=True)
+    
+    @action(detail=False, methods=['get'])
+    def current(self, request):
+        policy = PrivacyPolicy.objects.filter(is_active=True).first()
+        if policy:
+            serializer = self.get_serializer(policy)
+            return Response(serializer.data)
+        return Response({'error': 'No active privacy policy'}, status=404)
+
+class UserConsentViewSet(viewsets.ModelViewSet):
+    serializer_class = UserConsentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        return UserConsent.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        policy = PrivacyPolicy.objects.filter(is_active=True).first()
+        serializer.save(
+            user=self.request.user,
+            policy_version=policy,
+            ip_address=self.request.META.get('REMOTE_ADDR'),
+            user_agent=self.request.META.get('HTTP_USER_AGENT', '')
+        )
+    
+    @action(detail=False, methods=['post'])
+    def accept(self, request):
+        policy = PrivacyPolicy.objects.filter(is_active=True).first()
+        if not policy:
+            return Response({'error': 'No active policy'}, status=404)
+        
+        consent, created = UserConsent.objects.get_or_create(
+            user=request.user,
+            policy_version=policy,
+            defaults={
+                'consent_given': True,
+                'ip_address': request.META.get('REMOTE_ADDR'),
+                'user_agent': request.META.get('HTTP_USER_AGENT', '')
+            }
+        )
+        if not created and not consent.consent_given:
+            consent.consent_given = True
+            consent.save()
+        
+        return Response({'message': 'Privacy policy accepted'})

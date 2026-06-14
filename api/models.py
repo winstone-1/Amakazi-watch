@@ -18,7 +18,7 @@ class PrivacyPolicy(models.Model):
         return f"Privacy Policy v{self.version} - {self.effective_date.date()}"
 
 class UserConsent(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     policy_version = models.ForeignKey(PrivacyPolicy, on_delete=models.CASCADE)
     consent_given = models.BooleanField(default=True)
     ip_address = models.GenericIPAddressField()

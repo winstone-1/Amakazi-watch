@@ -47,7 +47,7 @@ def test_escape_plan(auth_client):
         'has_children': True,
         'documents_checklist': ['passport', 'medication'],
         'transportation_plan': 'Taxi to shelter',
-        'safe_locations': ['Police station', 'Friend's house'],
+        'safe_locations': ['Police station', "Friend's house"],
         'emergency_contacts': [{'name': 'Jane', 'phone': '+254712345678'}]
     }, format='json')
     assert response.status_code in [200, 201, 400, 404]

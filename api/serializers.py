@@ -172,3 +172,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'bookmarked_orgs', 'case_refs', 'created_at'
         ]
         read_only_fields = ['created_at']
+
+
+class EmergencyContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        from users.models import EmergencyContact
+        model  = EmergencyContact
+        fields = ["id", "name", "phone", "relation", "is_active", "created_at"]
+        read_only_fields = ["created_at"]

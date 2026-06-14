@@ -56,6 +56,11 @@ urlpatterns = [
     # Profile
     path("profile/", views.ProfileView.as_view(), name="profile"),
 
+    # Panic Button
+    path("panic/contacts/", views.EmergencyContactListView.as_view(), name="emergency-contacts"),
+    path("panic/contacts/<int:pk>/", views.EmergencyContactDeleteView.as_view(), name="emergency-contact-delete"),
+    path("panic/", views.PanicButtonView.as_view(), name="panic-button"),
+
     # Chat
     path("chat/", views.ChatView.as_view(), name="chat"),
 

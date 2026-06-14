@@ -997,3 +997,50 @@ class GoogleAuthCallbackView(APIView):
             })
         except SocialAccount.DoesNotExist:
             return Response({"error": "Google account not found"}, status=404)
+
+# -- Panic Button -------------------------------------------------------------
+class EmergencyContactListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from users.models import EmergencyContact
+        from .serializers import EmergencyContactSerializer
+        contacts = EmergencyContact.objects.filter(user=request.user)
+        return Response(EmergencyContactSerializer(contacts, many=True).data)
+
+    def post(self, request):
+        from users.models import EmergencyContact
+        from .serializers import EmergencyContactSerializer
+        serializer = EmergencyContactSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class PanicButtonView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        from users.panic import send_panic_alert
+        location = request.data.get("location", None)
+        result = send_panic_alert(request.user, location)
+        if result["success"]:
+            return Response({
+                "message": "Panic alert sent to all emergency contacts.",
+                "alerts":  result["alerts_sent"]
+            })
+        return Response({"error": result["error"]}, status=400)
+
+
+class EmergencyContactDeleteView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, pk):
+        from users.models import EmergencyContact
+        try:
+            contact = EmergencyContact.objects.get(pk=pk, user=request.user)
+            contact.delete()
+            return Response({"message": "Contact removed"})
+        except EmergencyContact.DoesNotExist:
+            return Response({"error": "Contact not found"}, status=404)

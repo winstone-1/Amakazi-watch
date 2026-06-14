@@ -68,6 +68,18 @@ class ReportCreateView(generics.CreateAPIView):
         if phone:
             send_case_reference_sms(phone, ref)
 
+        # Audit log
+        from notifications.utils import audit, check_report_spike
+        audit(
+            user=None,
+            action="anonymous_report_submitted",
+            model_name="IncidentReport",
+            object_id=ref,
+            details={"county": report.county, "abuse_type": report.abuse_type},
+            request=self.request,
+        )
+        check_report_spike(report.county)
+
         # AI classification
         if report.description:
             from api.utils.Groq import classify_report

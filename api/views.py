@@ -1482,3 +1482,165 @@ class WhatsAppWebhookView(APIView):
         # Default
         send_whatsapp(phone, "Command not recognised. Reply HELP for available commands.")
         return Response({"message": "Default reply sent"})
+
+
+# -- USSD ---------------------------------------------------------------------
+class USSDView(APIView):
+    """
+    Africa's Talking USSD callback.
+    Dial *384*SHORTCODE# to access AmakaziWatch via USSD.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        session_id   = request.data.get("sessionId", "")
+        phone        = request.data.get("phoneNumber", "")
+        network_code = request.data.get("networkCode", "")
+        text         = request.data.get("text", "")
+
+        response = ""
+        parts = text.split("*")
+        level = len(parts) if text else 0
+
+        # Level 0 — Main menu
+        if text == "":
+            response = (
+                "CON Welcome to AmakaziWatch
+"
+                "1. Report incident
+"
+                "2. Find help near me
+"
+                "3. Track my case
+"
+                "4. Emergency numbers"
+            )
+
+        # Level 1
+        elif text == "1":
+            response = (
+                "CON Select abuse type:
+"
+                "1. Physical
+"
+                "2. Emotional
+"
+                "3. Financial
+"
+                "4. Sexual
+"
+                "5. Digital"
+            )
+
+        elif text == "2":
+            response = (
+                "CON Select your county:
+"
+                "1. Nairobi
+"
+                "2. Mombasa
+"
+                "3. Kisumu
+"
+                "4. Nakuru
+"
+                "5. Other"
+            )
+
+        elif text == "3":
+            response = "CON Enter your case reference code:"
+
+        elif text == "4":
+            response = (
+                "END Emergency Numbers:
+"
+                "GBV Hotline: 1195
+"
+                "Childline: 116
+"
+                "Police: 999
+"
+                "FIDA Kenya: 0202721784"
+            )
+
+        # Level 2 — Report abuse type selected
+        elif parts[0] == "1" and len(parts) == 2:
+            abuse_map = {"1": "physical", "2": "emotional", "3": "financial", "4": "sexual", "5": "digital"}
+            abuse = abuse_map.get(parts[1], "other")
+            response = (
+                "CON Select your county:
+"
+                "1. Nairobi
+"
+                "2. Mombasa
+"
+                "3. Kisumu
+"
+                "4. Nakuru
+"
+                "5. Other"
+            )
+
+        # Level 3 — County selected, create report
+        elif parts[0] == "1" and len(parts) == 3:
+            import random, string, hashlib
+            from reports.models import IncidentReport
+
+            abuse_map  = {"1": "physical", "2": "emotional", "3": "financial", "4": "sexual", "5": "digital"}
+            county_map = {"1": "Nairobi", "2": "Mombasa", "3": "Kisumu", "4": "Nakuru", "5": "Other"}
+
+            abuse_type = abuse_map.get(parts[1], "other")
+            county     = county_map.get(parts[2], "Other")
+            ref        = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+            IncidentReport.objects.create(
+                abuse_type=abuse_type,
+                relationship="self",
+                county=county,
+                description=f"USSD report via {hashlib.sha256(phone.encode()).hexdigest()[:8]}",
+                sms_ref_code=ref,
+            )
+
+            response = (
+                f"END Report received.\n"
+                f"Reference: {ref}\n"
+                f"Save this code to track your case.\n"
+                f"GBV Hotline: 1195"
+            )
+
+        # Level 2 — Find help county selected
+        elif parts[0] == "2" and len(parts) == 2:
+            from organisations.models import Organisation
+            county_map = {"1": "Nairobi", "2": "Mombasa", "3": "Kisumu", "4": "Nakuru", "5": ""}
+            county = county_map.get(parts[1], "")
+            orgs   = Organisation.objects.filter(verified=True, county__icontains=county)[:2]
+
+            if orgs:
+                lines = ["END Help near you:"]
+                for org in orgs:
+                    lines.append(f"{org.name}: {org.phone or 'N/A'}")
+                response = "\n".join(lines)
+            else:
+                response = "END No organisations found. Call 1195 for help."
+
+        # Level 2 — Case tracking ref entered
+        elif parts[0] == "3" and len(parts) == 2:
+            from reports.models import IncidentReport, CaseUpdate
+            ref = parts[1].strip()
+            try:
+                report  = IncidentReport.objects.get(sms_ref_code=ref)
+                updates = CaseUpdate.objects.filter(ref_code=ref).count()
+                response = (
+                    f"END Case {ref}:\n"
+                    f"Type: {report.abuse_type}\n"
+                    f"County: {report.county}\n"
+                    f"Updates: {updates}"
+                )
+            except IncidentReport.DoesNotExist:
+                response = f"END Case {ref} not found. Check your reference."
+
+        else:
+            response = "END Invalid option. Dial again."
+
+        from django.http import HttpResponse
+        return HttpResponse(response, content_type="text/plain")

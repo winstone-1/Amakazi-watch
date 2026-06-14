@@ -2015,6 +2015,137 @@
           }
         }
       ]
+    },
+    {
+      "name": "Privacy & Data Export",
+      "item": [
+        {
+          "name": "Privacy Policy - View Current",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/privacy-policy/current/",
+            "header": []
+          }
+        },
+        {
+          "name": "Privacy Policy - Accept",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/user-consent/accept/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Data Export - Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/export/request/",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"format\": \"json\"\n}"
+            }
+          }
+        },
+        {
+          "name": "SOS Broadcast",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/sos/broadcast/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": \"Westlands, Nairobi\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Shelter Booking",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/shelter/booking/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organisation_id\": 1,\n  \"check_in\": \"2025-01-20T14:00:00\",\n  \"duration_days\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "Police Report - Generate P3",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/police-report/generate/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"case_ref\": \"NBI00001\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Offline Report - Queue",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/offline/queue/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"report_data\": {\n    \"abuse_type\": \"physical\",\n    \"description\": \"Assault occurred\",\n    \"county\": \"Nairobi\"\n  },\n  \"device_id\": \"mobile123\"\n}"
+            }
+          }
+        }
+      ]
     }
   ]
 }

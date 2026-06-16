@@ -2144,6 +2144,117 @@
               "raw": "{\n  \"report_data\": {\n    \"abuse_type\": \"physical\",\n    \"description\": \"Assault occurred\",\n    \"county\": \"Nairobi\"\n  },\n  \"device_id\": \"mobile123\"\n}"
             }
           }
+        },
+        {
+          "name": "Activity Feed - Get My Feed",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/activity-feed/",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Register as Counsellor",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/counsellor/register/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"specialization\": \"trauma\",\n  \"experience_years\": 3,\n  \"availability\": [\"Mon\", \"Wed\", \"Fri\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Admin - List All Users",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/admin/users/",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Admin - System Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/admin/stats/",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Notifications - Mark All Read",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/notifications/read-all/",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Notifications - Delete All Read",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/notifications/clear-read/",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Terms of Service - View Current",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/terms/",
+            "header": []
+          }
+        },
+        {
+          "name": "Terms of Service - Accept",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/terms/accept/",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
         }
       ]
     }

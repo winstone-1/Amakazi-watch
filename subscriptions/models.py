@@ -25,15 +25,20 @@ class Subscription(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE,
+        null=True,  # <-- ADD THIS
+        blank=True  # <-- ADD THIS
+    )
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
-    start_date = models.DateTimeField(default=timezone.now)  # Fixed: removed auto_now_add=True
+    start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(default=timezone.now)
     payment_reference = models.CharField(max_length=100, blank=True)
     
     def __str__(self):
-        return f"{self.user.username} - {self.plan.name}"
+        return f"{self.user.username if self.user else 'No user'} - {self.plan.name if self.plan else 'No plan'}"
 
 class SubscriptionPayment(models.Model):
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)

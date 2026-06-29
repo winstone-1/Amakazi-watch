@@ -28,21 +28,40 @@ class Subscription(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE,
-        null=True,  # <-- ADD THIS
-        blank=True  # <-- ADD THIS
+        null=True,
+        blank=True
     )
-    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=True, blank=True)
+    plan = models.ForeignKey(
+        Plan, 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(default=timezone.now)
-    payment_reference = models.CharField(max_length=100, blank=True)
+    payment_reference = models.CharField(max_length=100, blank=True, null=True)
     
     def __str__(self):
         return f"{self.user.username if self.user else 'No user'} - {self.plan.name if self.plan else 'No plan'}"
 
 class SubscriptionPayment(models.Model):
-    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    reference = models.CharField(max_length=100)
-    status = models.CharField(max_length=20, default='pending')
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ]
+    
+    subscription = models.ForeignKey(
+        Subscription, 
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    reference = models.CharField(max_length=100, blank=True, null=True)  # <-- FIXED: added null=True
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.reference or 'No ref'} - {self.status}"

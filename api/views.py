@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from django.utils.translation import gettext as _
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils import translation
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class LanguageSwitchView(APIView):
     permission_classes = [AllowAny]
@@ -24,7 +26,7 @@ class ProfileView(APIView):
             'id': user.id,
             'username': user.username,
             'email': user.email,
-            'role': user.role,
+            'role': getattr(user, 'role', 'survivor'),
             'phone': getattr(user, 'phone', ''),
             'county': getattr(user, 'county', ''),
             'bio': getattr(user, 'bio', ''),
@@ -41,7 +43,7 @@ class ProfileView(APIView):
             'id': user.id,
             'username': user.username,
             'email': user.email,
-            'role': user.role,
+            'role': getattr(user, 'role', 'survivor'),
             'phone': getattr(user, 'phone', ''),
             'county': getattr(user, 'county', ''),
             'bio': getattr(user, 'bio', ''),

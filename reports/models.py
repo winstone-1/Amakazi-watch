@@ -1,79 +1,45 @@
 from django.db import models
-import uuid
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class IncidentReport(models.Model):
-    class AbuseType(models.TextChoices):
-        PHYSICAL  = 'physical',  'Physical'
-        EMOTIONAL = 'emotional', 'Emotional'
-        FINANCIAL = 'financial', 'Financial'
-        SEXUAL    = 'sexual',    'Sexual'
-        DIGITAL   = 'digital',   'Digital'
-
-    class Relationship(models.TextChoices):
-        SELF      = 'self',      'Myself'
-        FAMILY    = 'family',    'Family Member'
-        NEIGHBOUR = 'neighbour', 'Neighbour'
-        COLLEAGUE = 'colleague', 'Colleague'
-        OTHER     = 'other',     'Other'
-
-    id                 = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    abuse_type         = models.CharField(max_length=20, choices=AbuseType.choices)
-    relationship       = models.CharField(max_length=20, choices=Relationship.choices)
-    county             = models.CharField(max_length=100)
-    sub_county         = models.CharField(max_length=100, blank=True)
-    description        = models.TextField(blank=True)
-    evidence_url       = models.URLField(blank=True)
-    sms_ref_code       = models.CharField(max_length=12, blank=True)
-    urgency_score      = models.IntegerField(null=True, blank=True)
-    ai_classification  = models.CharField(max_length=50, blank=True)
-    flagged_for_review = models.BooleanField(default=False)
-    created_at         = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
+    ABUSE_TYPES = [
+        ('physical', 'Physical Abuse'),
+        ('sexual', 'Sexual Abuse'),
+        ('emotional', 'Emotional Abuse'),
+        ('economic', 'Economic Abuse'),
+        ('digital', 'Digital Abuse'),
+        ('other', 'Other'),
+    ]
+    
+    RELATIONSHIP_CHOICES = [
+        ('self', 'Self'),
+        ('family', 'Family Member'),
+        ('partner', 'Partner/Spouse'),
+        ('friend', 'Friend'),
+        ('colleague', 'Colleague'),
+        ('other', 'Other'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('reviewed', 'Reviewed'),
+        ('resolved', 'Resolved'),
+        ('dismissed', 'Dismissed'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    abuse_type = models.CharField(max_length=20, choices=ABUSE_TYPES)
+    relationship = models.CharField(max_length=20, choices=RELATIONSHIP_CHOICES)
+    county = models.CharField(max_length=50)
+    sub_county = models.CharField(max_length=50, blank=True)
+    description = models.TextField()
+    phone = models.CharField(max_length=20, blank=True)
+    is_anonymous = models.BooleanField(default=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
-        return f"{self.abuse_type} — {self.county} — {self.sms_ref_code}"
-
-
-class CaseUpdate(models.Model):
-    class UpdateType(models.TextChoices):
-        FOLLOW_UP   = "follow_up",   "Follow Up"
-        POLICE      = "police",      "Reported to Police"
-        LEGAL       = "legal",       "Legal Aid Contacted"
-        MEDICAL     = "medical",     "Medical Attention Received"
-        SHELTER     = "shelter",     "Safe Shelter Found"
-        RESOLVED    = "resolved",    "Case Resolved"
-        OTHER       = "other",       "Other"
-
-    ref_code    = models.CharField(max_length=12)
-    update_type = models.CharField(max_length=20, choices=UpdateType.choices)
-    notes       = models.TextField(blank=True)
-    created_at  = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"{self.ref_code} — {self.update_type}"
-
-
-class VoiceReport(models.Model):
-    class Status(models.TextChoices):
-        PENDING     = "pending",     "Pending Transcription"
-        TRANSCRIBED = "transcribed", "Transcribed"
-        CLASSIFIED  = "classified",  "AI Classified"
-        FAILED      = "failed",      "Failed"
-
-    session_id      = models.CharField(max_length=100, unique=True)
-    phone_hash      = models.CharField(max_length=100)
-    recording_url   = models.URLField(blank=True)
-    transcript      = models.TextField(blank=True)
-    abuse_type      = models.CharField(max_length=20, blank=True)
-    county          = models.CharField(max_length=100, blank=True)
-    urgency_score   = models.IntegerField(null=True, blank=True)
-    status          = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
-    created_at      = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Voice Report {self.session_id} — {self.status}"
+        return f"{self.get_abuse_type_display()} - {self.county} ({self.created_at.date()})"

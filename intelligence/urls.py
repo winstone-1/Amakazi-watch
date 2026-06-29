@@ -1,10 +1,11 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import APIKeyViewSet, APIUsageLogViewSet
+
+router = DefaultRouter()
+router.register(r'keys', APIKeyViewSet, basename='api-key')
+router.register(r'logs', APIUsageLogViewSet, basename='api-log')
 
 urlpatterns = [
-    path("keys/", views.APIKeyListView.as_view(), name="api-key-list"),
-    path("keys/create/", views.APIKeyCreateView.as_view(), name="api-key-create"),
-    path("county-risk/", views.CountyRiskScoreView.as_view(), name="county-risk"),
-    path("abuse-distribution/", views.AbuseTypeDistributionView.as_view(), name="abuse-distribution"),
-    path("trend-forecast/", views.TrendForecastView.as_view(), name="trend-forecast"),
+    path('', include(router.urls)),
 ]

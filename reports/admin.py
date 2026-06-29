@@ -3,6 +3,6 @@ from .models import IncidentReport
 
 @admin.register(IncidentReport)
 class IncidentReportAdmin(admin.ModelAdmin):
-    list_display  = ['sms_ref_code', 'abuse_type', 'county', 'urgency_score', 'flagged_for_review', 'created_at']
-    list_filter   = ['abuse_type', 'county', 'flagged_for_review']
-    readonly_fields = ['id', 'sms_ref_code', 'created_at']
+    list_display = ('id', 'abuse_type', 'county', 'status', 'created_at')
+    list_filter = ('abuse_type', 'status', 'county')
+    search_fields = ('description', 'phone')

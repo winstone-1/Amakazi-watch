@@ -1,17 +1,8 @@
 from django.contrib import admin
-from .models import Organisation, Donation
+from .models import Organisation
 
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
-    list_display = ['name', 'county', 'verified', 'created_at']
-    list_filter  = ['verified', 'county']
-    actions      = ['verify_organisations']
-
-    @admin.action(description='Mark selected as verified')
-    def verify_organisations(self, request, queryset):
-        queryset.update(verified=True)
-
-@admin.register(Donation)
-class DonationAdmin(admin.ModelAdmin):
-    list_display = ['organisation', 'amount', 'status', 'created_at']
-    list_filter  = ['status']
+    list_display = ('id', 'name', 'org_type', 'county', 'is_verified', 'created_at')
+    list_filter = ('org_type', 'is_verified', 'county')
+    search_fields = ('name', 'email', 'phone')

@@ -1,30 +1,14 @@
 {
   "info": {
-    "name": "AmakaziWatch API v3",
-    "description": "Kenya's first crowdsourced GBV awareness, reporting and prevention platform.\n\nSet base_url = http://127.0.0.1:8000\nAfter login, paste access token into the access_token variable.\nFor Intelligence endpoints use X-API-Key header instead of Bearer token.\n\nNEW FEATURES ADDED:\n- Safety Timer with Check-in\n- Safe Word Alert System  \n- Risk Assessment Tool\n- Escape Plan Generator\n- Document Vault (Encrypted Evidence)\n- Peer Support Network\n- Legal Rights Bot (Kenyan Law)\n- Organization Resource Inventory\n- Case Matching AI\n- Inter-Org Messaging\n- Volunteer Management\n- Hotspot Prediction Alerts\n- Awareness Campaign Manager\n- Virtual Workshops\n- Anonymous Tips Line\n- County Performance Scorecards",
+    "name": "AmakaziWatch API v3 - Complete",
+    "description": "Kenya's first crowdsourced GBV awareness, reporting and prevention platform.\n\nSet base_url = http://127.0.0.1:8000\nAfter login, paste access token into the access_token variable.\nFor Intelligence endpoints use X-API-Key header instead of Bearer token.\n\nCOMPLETE API INCLUDES:\n- Authentication (JWT + Google OAuth + 2FA)\n- Profile & RBAC (5 Roles)\n- Reports & Statistics\n- Safety (Timer, Safe Word, Risk Assessment, Escape Plan)\n- Document Vault (Evidence Storage)\n- Peer Support (Chat)\n- Legal Rights Bot (English/Swahili)\n- Organizations & Reviews\n- Organization Coordination (Inventory, Case Matching, Messaging)\n- Content & Education\n- Awareness Campaigns\n- Virtual Workshops\n- Anonymous Tips\n- County Scorecards\n- Admin Operations\n- Terms & Privacy\n- Intelligence API (API Keys, Analytics)\n- Notifications\n- Panic Button\n- Language Switching\n- AI Chat\n- Subscriptions & Plans\n- Payments (M-Pesa, Paystack, Card)\n- Donations\n- Licensing\n- FAQ & Resources\n- Success Stories\n- Heatmap\n- Quizzes\n- Donations & Fundraising\n- Licensing & Compliance",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://127.0.0.1:8000",
-      "type": "string"
-    },
-    {
-      "key": "access_token",
-      "value": "paste_access_token_here",
-      "type": "string"
-    },
-    {
-      "key": "refresh_token",
-      "value": "paste_refresh_token_here",
-      "type": "string"
-    },
-    {
-      "key": "api_key",
-      "value": "paste_intelligence_api_key_here",
-      "type": "string"
-    }
+    {"key": "base_url", "value": "http://127.0.0.1:8000", "type": "string"},
+    {"key": "access_token", "value": "paste_access_token_here", "type": "string"},
+    {"key": "refresh_token", "value": "paste_refresh_token_here", "type": "string"},
+    {"key": "api_key", "value": "paste_intelligence_api_key_here", "type": "string"}
   ],
   "item": [
     {
@@ -35,16 +19,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/auth/register/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@amakaziwatch.com\",\n  \"password\": \"Test@1234\"\n}"
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@amakaziwatch.com\",\n  \"password\": \"Test@1234\",\n  \"role\": \"survivor\"\n}"}
           }
         },
         {
@@ -52,164 +28,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/auth/token/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test@1234\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Refresh Token",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/auth/token/refresh/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Password Reset Request",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/auth/password-reset/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"test@amakaziwatch.com\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Password Reset Confirm",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/auth/password-reset/confirm/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"uid\": \"uid_from_email\",\n  \"token\": \"token_from_email\",\n  \"password\": \"NewPass@5678\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Password Change",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/auth/password-change/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"old_password\": \"Test@1234\",\n  \"new_password\": \"NewPass@5678\"\n}"
-            }
-          }
-        },
-        {
-          "name": "2FA Setup \u2014 Get QR Code",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/auth/2fa/setup/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "2FA Setup \u2014 Verify and Enable",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/auth/2fa/setup/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"code\": \"123456\"\n}"
-            }
-          }
-        },
-        {
-          "name": "2FA Verify",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/auth/2fa/verify/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"code\": \"123456\"\n}"
-            }
-          }
-        },
-        {
-          "name": "2FA Disable",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/auth/2fa/disable/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"password\": \"Test@1234\"\n}"
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test@1234\"\n}"}
           }
         },
         {
@@ -217,43 +37,129 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/auth/google/callback/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"uid\": \"google_uid_from_admin\"\n}"
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"access_token\": \"google_access_token_here\",\n  \"user_info\": {\n    \"email\": \"user@gmail.com\",\n    \"name\": \"Google User\",\n    \"picture\": \"https://...\"\n  }\n}"}
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/token/refresh/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"}
+          }
+        },
+        {
+          "name": "Password Reset Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/password-reset/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"test@amakaziwatch.com\"\n}"}
+          }
+        },
+        {
+          "name": "Password Reset Confirm",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/password-reset/confirm/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"uid\": \"uid_from_email\",\n  \"token\": \"token_from_email\",\n  \"password\": \"NewPass@5678\"\n}"}
+          }
+        },
+        {
+          "name": "Password Change",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/password-change/",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"old_password\": \"Test@1234\",\n  \"new_password\": \"NewPass@5678\"\n}"}
+          }
+        },
+        {
+          "name": "2FA Setup - Get QR Code",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/auth/2fa/setup/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "2FA Setup - Verify and Enable",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/2fa/setup/",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"code\": \"123456\"\n}"}
+          }
+        },
+        {
+          "name": "2FA Verify",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/2fa/verify/",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"code\": \"123456\"\n}"}
+          }
+        },
+        {
+          "name": "2FA Disable",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/2fa/disable/",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"password\": \"Test@1234\"\n}"}
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/logout/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/profile/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/api/profile/",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"phone\": \"+254712345678\",\n  \"county\": \"Nairobi\",\n  \"bio\": \"GBV survivor advocate\",\n  \"role\": \"counselor\"\n}"}
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/password-change/",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"old_password\": \"Test@1234\",\n  \"new_password\": \"NewPass@5678\"\n}"}
           }
         }
       ]
     },
     {
-      "name": "Safety & Emergency Features",
+      "name": "Safety & Emergency",
       "item": [
         {
           "name": "Start Safety Timer",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/safety/timer/start/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"duration_minutes\": 60,\n  \"location_lat\": \"-1.286389\",\n  \"location_lng\": \"36.817223\"\n}"
-            },
-            "description": "Starts a safety timer. If not checked in, alerts emergency contacts."
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"duration_minutes\": 60,\n  \"location_lat\": \"-1.286389\",\n  \"location_lng\": \"36.817223\"\n}"}
           }
         },
         {
@@ -261,48 +167,15 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/safety/timer/check-in/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "description": "Check in to active safety timer to prevent escalation."
-          }
-        },
-        {
-          "name": "Get Active Timer",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/safety/timer/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Set Safe Word",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/safety/safe-word/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"code_word\": \"blueberry\"\n}"
-            },
-            "description": "Set a secret code word for emergency situations."
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"code_word\": \"blueberry\"\n}"}
           }
         },
         {
@@ -310,43 +183,17 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/safety/safe-word/trigger/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"location\": \"Westlands, Nairobi\"\n}"
-            },
-            "description": "Trigger emergency alert using your safe word."
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"location\": \"Westlands, Nairobi\"\n}"}
           }
         },
         {
-          "name": "Take Risk Assessment",
+          "name": "Risk Assessment",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/safety/risk-assessment/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"answers\": {\n    \"partner_controls_money\": true,\n    \"previous_violence\": true,\n    \"threats_with_weapon\": false,\n    \"children_in_danger\": true,\n    \"stalking\": false\n  }\n}"
-            },
-            "description": "15-question risk assessment generates safety plan."
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"answers\": {\n    \"partner_controls_money\": true,\n    \"previous_violence\": true,\n    \"threats_with_weapon\": false,\n    \"children_in_danger\": true,\n    \"stalking\": false\n  }\n}"}
           }
         },
         {
@@ -354,172 +201,82 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/safety/escape-plan/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"county\": \"Nairobi\",\n  \"has_children\": true,\n  \"has_pets\": false,\n  \"needs_transport\": true\n}"
-            },
-            "description": "Generates personalized escape plan with resources."
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"county\": \"Nairobi\",\n  \"has_children\": true,\n  \"has_pets\": false,\n  \"needs_transport\": true\n}"}
           }
         },
         {
-          "name": "Emergency Exit (Discreet)",
+          "name": "Emergency Exit",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/safety/emergency-exit/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "description": "Immediately redirects to weather site and clears session."
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Schedule Safe Call",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/safety/schedule-call/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"scheduled_time\": \"2024-12-25T15:00:00\",\n  \"fake_caller_name\": \"Dr. Smith\",\n  \"fake_reason\": \"Medical appointment\"\n}"
-            },
-            "description": "Schedule a fake call as excuse to leave dangerous situation."
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"scheduled_time\": \"2024-12-25T15:00:00\",\n  \"fake_caller_name\": \"Dr. Smith\",\n  \"fake_reason\": \"Medical appointment\"\n}"}
           }
         }
       ]
     },
     {
-      "name": "Document Vault (Evidence)",
+      "name": "Document Vault",
       "item": [
         {
           "name": "Upload Evidence",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/vault/documents/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}],
             "body": {
               "mode": "formdata",
               "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": ""
-                },
-                {
-                  "key": "file_type",
-                  "value": "image",
-                  "type": "text"
-                },
-                {
-                  "key": "description",
-                  "value": "Bruises on arm after incident",
-                  "type": "text"
-                },
-                {
-                  "key": "incident_date",
-                  "value": "2024-01-15T10:30:00",
-                  "type": "text"
-                },
-                {
-                  "key": "metadata_json",
-                  "value": "{\"location\": \"Nairobi\", \"witness\": \"neighbor\"}",
-                  "type": "text"
-                }
+                {"key": "file", "type": "file", "src": ""},
+                {"key": "file_type", "value": "image", "type": "text"},
+                {"key": "description", "value": "Bruises on arm after incident", "type": "text"},
+                {"key": "incident_date", "value": "2024-01-15T10:30:00", "type": "text"},
+                {"key": "metadata_json", "value": "{\"location\": \"Nairobi\", \"witness\": \"neighbor\"}", "type": "text"}
               ]
-            },
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "description": "Upload evidence (images, videos, documents) - encrypted storage"
+            }
           }
         },
         {
-          "name": "List Evidence Documents",
+          "name": "List Evidence",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/vault/documents/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Download Evidence",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/vault/documents/1/download/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Delete Evidence",
           "request": {
             "method": "DELETE",
             "url": "{{base_url}}/api/vault/documents/1/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         }
       ]
     },
     {
-      "name": "Peer Support Network",
+      "name": "Peer Support",
       "item": [
         {
           "name": "Find Peer Supporter",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/peer/sessions/find/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"language\": \"en\",\n  \"county\": \"Nairobi\",\n  \"preferred_gender\": \"female\"\n}"
-            },
-            "description": "Match with trained peer supporter (anonymous)"
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"language\": \"en\",\n  \"county\": \"Nairobi\",\n  \"preferred_gender\": \"female\"\n}"}
           }
         },
         {
@@ -527,47 +284,23 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/peer/sessions/1/message/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"message\": \"I feel scared to leave but I know I need to\"\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"message\": \"I feel scared to leave but I know I need to\"\n}"}
           }
         },
         {
-          "name": "List My Sessions",
+          "name": "List Sessions",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/peer/sessions/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
-          "name": "End Peer Session",
+          "name": "End Session",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/peer/sessions/1/end/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         }
       ]
     },
@@ -575,37 +308,161 @@
       "name": "Legal Rights Bot",
       "item": [
         {
-          "name": "Ask Legal Question",
+          "name": "Ask Legal Question (English)",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/legal/ask/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"question\": \"What are my rights if my husband takes all my money?\",\n  \"session_id\": \"user123\"\n}"
-            },
-            "description": "Ask questions about Kenyan GBV laws"
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept-Language", "value": "en"}],
+            "body": {"mode": "raw", "raw": "{\n  \"question\": \"What are my rights if my husband takes all my money?\",\n  \"session_id\": \"user123\"\n}"}
           }
         },
         {
-          "name": "Search Kenyan Laws",
+          "name": "Ask Legal Question (Swahili)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/legal/ask/",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept-Language", "value": "sw"}],
+            "body": {"mode": "raw", "raw": "{\n  \"question\": \"Nina haki gani ikiwa mume wangu anachukua pesa zangu zote?\",\n  \"session_id\": \"user123\"\n}"}
+          }
+        },
+        {
+          "name": "Search Laws",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/legal/reference/?q=domestic violence",
-            "header": []
-          }
+            "header": []}
         },
         {
-          "name": "Get Law by Name",
+          "name": "Get Law by ID",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/legal/reference/1/",
-            "header": []
+            "header": []}
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Submit Report",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/reports/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"abuse_type\": \"physical\",\n  \"relationship\": \"self\",\n  \"county\": \"Nairobi\",\n  \"sub_county\": \"Westlands\",\n  \"description\": \"Repeated assault by family member. Children present.\",\n  \"phone\": \"+254712345678\"\n}"}
+          }
+        },
+        {
+          "name": "Submit Report with Photo",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/reports/",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "abuse_type", "value": "digital", "type": "text"},
+                {"key": "relationship", "value": "other", "type": "text"},
+                {"key": "county", "value": "Mombasa", "type": "text"},
+                {"key": "description", "value": "Threatening messages sent online.", "type": "text"},
+                {"key": "phone", "value": "+254712345678", "type": "text"},
+                {"key": "evidence_file", "type": "file", "src": ""}
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Reports",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/reports/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Report Statistics",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/reports/stats/",
+            "header": []}
+        },
+        {
+          "name": "Heatmap Data",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/reports/heatmap/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        }
+      ]
+    },
+    {
+      "name": "Organisations",
+      "item": [
+        {
+          "name": "List Organisations",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/",
+            "header": []}
+        },
+        {
+          "name": "Filter by County",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/organisations/?county=Nairobi", "query": [{"key": "county", "value": "Nairobi"}]},
+            "header": []}
+        },
+        {
+          "name": "Register Organisation",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/organisations/register/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Test NGO Kisumu\",\n  \"org_type\": \"ngo\",\n  \"description\": \"GBV support in Kisumu\",\n  \"services\": \"counselling,legal aid\",\n  \"county\": \"Kisumu\",\n  \"sub_county\": \"Kisumu Central\",\n  \"phone\": \"0721000222\",\n  \"email\": \"info@testngo.org\",\n  \"latitude\": \"-0.1022\",\n  \"longitude\": \"34.7617\"\n}"}
+          }
+        },
+        {
+          "name": "GeoJSON Map",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/map/",
+            "header": []}
+        },
+        {
+          "name": "Heatmap GeoJSON",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/heatmap/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Impact Dashboard",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/1/impact/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Bookmark Org",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/organisations/1/bookmark/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Get Reviews",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/organisations/1/reviews/",
+            "header": []}
+        },
+        {
+          "name": "Submit Review",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/organisations/1/reviews/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"rating\": 5,\n  \"review\": \"Very helpful, connected me with legal aid quickly.\"\n}"}
           }
         }
       ]
@@ -614,24 +471,12 @@
       "name": "Organization Coordination",
       "item": [
         {
-          "name": "Update Resource Inventory",
+          "name": "Update Inventory",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/org/inventory/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"resource_type\": \"bed\",\n  \"available_count\": 5,\n  \"total_capacity\": 20\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"resource_type\": \"bed\",\n  \"available_count\": 5,\n  \"total_capacity\": 20\n}"}
           }
         },
         {
@@ -639,28 +484,15 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/org/inventory/county/?county=Nairobi",
-            "header": []
-          }
+            "header": []}
         },
         {
-          "name": "Match Case to Organization",
+          "name": "Match Case",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/org/case-matching/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"case_ref\": \"NBI00001\",\n  \"survivor_needs\": {\n    \"legal_aid\": true,\n    \"counseling\": true,\n    \"shelter\": false\n  }\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"case_ref\": \"NBI00001\",\n  \"survivor_needs\": {\n    \"legal_aid\": true,\n    \"counseling\": true,\n    \"shelter\": false\n  }\n}"}
           }
         },
         {
@@ -668,20 +500,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/org/messages/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"to_org\": 2,\n  \"message\": \"Can you take over this legal case? Need specialized support.\",\n  \"case_ref\": \"NBI00001\"\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"to_org\": 2,\n  \"message\": \"Can you take over this legal case? Need specialized support.\",\n  \"case_ref\": \"NBI00001\"\n}"}
           }
         },
         {
@@ -689,34 +509,93 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/org/hotspots/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Register Volunteer",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/org/volunteers/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"role\": \"counselor\",\n  \"training_completed\": [\"gbv_101\", \"trauma_informed\"]\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"role\": \"counselor\",\n  \"training_completed\": [\"gbv_101\", \"trauma_informed\"]\n}"}
           }
+        }
+      ]
+    },
+    {
+      "name": "Content & Education",
+      "item": [
+        {
+          "name": "List Content",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/content/",
+            "header": []}
+        },
+        {
+          "name": "Filter by Topic",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/content/?topic=legal", "query": [{"key": "topic", "value": "legal"}]},
+            "header": []}
+        },
+        {
+          "name": "Filter by Format",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/content/?format=article", "query": [{"key": "format", "value": "article"}]},
+            "header": []}
+        },
+        {
+          "name": "Featured Content",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/content/featured/",
+            "header": []}
+        },
+        {
+          "name": "Submit Content",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/content/create/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"title\": \"Understanding Financial Abuse\",\n  \"body\": \"Financial abuse includes controlling all household money...\",\n  \"format\": \"article\",\n  \"topic\": \"recognise\",\n  \"organisation\": 1\n}"}
+          }
+        },
+        {
+          "name": "Rate Content",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/content/1/rate/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"rating\": 5\n}"}
+          }
+        },
+        {
+          "name": "YouTube Search",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/content/youtube/search/?q=GBV Kenya",
+            "header": []}
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "List Quizzes",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/quizzes/",
+            "header": []}
+        },
+        {
+          "name": "Record Completion",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/quizzes/1/complete/",
+            "header": []}
         }
       ]
     },
@@ -728,20 +607,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/campaigns/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"16 Days of Activism\",\n  \"message\": \"Stand against GBV. Know your rights. Call 1195 for help.\",\n  \"channels\": [\"sms\", \"whatsapp\"],\n  \"target_counties\": [\"Nairobi\", \"Kisumu\", \"Mombasa\"],\n  \"scheduled_for\": \"2024-12-01T08:00:00\"\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"title\": \"16 Days of Activism\",\n  \"message\": \"Stand against GBV. Know your rights. Call 1195 for help.\",\n  \"channels\": [\"sms\", \"whatsapp\"],\n  \"target_counties\": [\"Nairobi\", \"Kisumu\", \"Mombasa\"],\n  \"scheduled_for\": \"2024-12-01T08:00:00\"\n}"}
           }
         },
         {
@@ -749,26 +616,14 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/campaigns/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
-          "name": "Get Campaign Stats",
+          "name": "Campaign Stats",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/campaigns/1/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         }
       ]
     },
@@ -780,41 +635,22 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/workshops/",
-            "header": []
-          }
+            "header": []}
         },
         {
           "name": "Register for Workshop",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/workshops/1/register/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Submit Workshop Feedback",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/workshops/1/feedback/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"rating\": 5,\n  \"feedback\": \"Very helpful! Learned about my legal rights.\"\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"rating\": 5,\n  \"feedback\": \"Very helpful! Learned about my legal rights.\"\n}"}
           }
         }
       ]
@@ -827,17 +663,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/tips/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"tip_text\": \"My neighbor is being abused daily by her husband. Children are witnessing violence.\",\n  \"incident_county\": \"Nairobi\",\n  \"incident_date\": \"2024-01-15T10:30:00\",\n  \"reporter_relationship\": \"neighbor\",\n  \"is_urgent\": true\n}"
-            },
-            "description": "Report someone else's situation anonymously"
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"tip_text\": \"My neighbor is being abused daily by her husband. Children are witnessing violence.\",\n  \"incident_county\": \"Nairobi\",\n  \"incident_date\": \"2024-01-15T10:30:00\",\n  \"reporter_relationship\": \"neighbor\",\n  \"is_urgent\": true\n}"}
           }
         }
       ]
@@ -850,491 +677,111 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/scorecard/rankings/",
-            "header": []
-          }
+            "header": []}
         },
         {
           "name": "View Specific County",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/scorecard/Nairobi/",
-            "header": []
-          }
+            "header": []}
         }
       ]
     },
     {
-      "name": "Reports",
+      "name": "Admin Operations",
       "item": [
         {
-          "name": "Submit Anonymous Report",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/reports/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"abuse_type\": \"physical\",\n  \"relationship\": \"self\",\n  \"county\": \"Nairobi\",\n  \"sub_county\": \"Westlands\",\n  \"description\": \"Repeated assault by family member. Children present.\",\n  \"phone\": \"+254712345678\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Submit Report with Photo",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/reports/",
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "abuse_type",
-                  "value": "digital",
-                  "type": "text"
-                },
-                {
-                  "key": "relationship",
-                  "value": "other",
-                  "type": "text"
-                },
-                {
-                  "key": "county",
-                  "value": "Mombasa",
-                  "type": "text"
-                },
-                {
-                  "key": "description",
-                  "value": "Threatening messages sent online.",
-                  "type": "text"
-                },
-                {
-                  "key": "phone",
-                  "value": "+254712345678",
-                  "type": "text"
-                },
-                {
-                  "key": "evidence_file",
-                  "type": "file",
-                  "src": ""
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Heatmap Data",
+          "name": "Admin - List Users",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/reports/heatmap/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "url": "{{base_url}}/api/admin/users/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
-          "name": "Report Statistics",
+          "name": "Admin - User Stats",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/reports/stats/",
-            "header": []
-          }
+            "url": "{{base_url}}/api/admin/users/stats/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Admin - List Organisations",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/admin/organisations/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Admin - Verify Organisation",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/admin/organisations/1/verify/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Admin - List Reports",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/admin/reports/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Admin - Flag Report",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/admin/reports/1/flag/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Admin - Resolve Report",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/admin/reports/1/resolve/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         }
       ]
     },
     {
-      "name": "Organisations",
+      "name": "Terms & Privacy",
       "item": [
         {
-          "name": "List Verified Orgs",
+          "name": "Terms - View (English)",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/organisations/",
-            "header": []
-          }
+            "url": "{{base_url}}/api/terms/",
+            "header": [{"key": "Accept-Language", "value": "en"}]}
         },
         {
-          "name": "Filter by County",
+          "name": "Terms - View (Swahili)",
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/organisations/?county=Nairobi",
-              "query": [
-                {
-                  "key": "county",
-                  "value": "Nairobi"
-                }
-              ]
-            },
-            "header": []
-          }
+            "url": "{{base_url}}/api/terms/",
+            "header": [{"key": "Accept-Language", "value": "sw"}]}
         },
         {
-          "name": "Register Organisation",
+          "name": "Terms - Accept",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/organisations/register/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Test NGO Kisumu\",\n  \"org_type\": \"ngo\",\n  \"description\": \"GBV support in Kisumu\",\n  \"services\": \"counselling,legal aid\",\n  \"county\": \"Kisumu\",\n  \"sub_county\": \"Kisumu Central\",\n  \"phone\": \"0721000222\",\n  \"email\": \"info@testngo.org\",\n  \"latitude\": \"-0.1022\",\n  \"longitude\": \"34.7617\"\n}"
-            }
+            "url": "{{base_url}}/api/terms/accept/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{}"}
           }
         },
         {
-          "name": "GeoJSON Map",
+          "name": "Privacy Policy - View",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/organisations/map/",
-            "header": []
-          }
+            "url": "{{base_url}}/api/privacy-policy/current/",
+            "header": []}
         },
         {
-          "name": "Heatmap GeoJSON",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/organisations/heatmap/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Impact Dashboard",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/organisations/1/impact/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Bookmark Org",
+          "name": "Privacy Policy - Accept",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/organisations/1/bookmark/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Reviews",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/organisations/1/reviews/",
-            "header": []
-          }
-        },
-        {
-          "name": "Submit Review",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/organisations/1/reviews/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"rating\": 5,\n  \"review\": \"Very helpful, connected me with legal aid quickly.\"\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Content",
-      "item": [
-        {
-          "name": "List Content",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/content/",
-            "header": []
-          }
-        },
-        {
-          "name": "Filter by Topic",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/content/?topic=legal",
-              "query": [
-                {
-                  "key": "topic",
-                  "value": "legal"
-                }
-              ]
-            },
-            "header": []
-          }
-        },
-        {
-          "name": "Filter by Format",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/content/?format=article",
-              "query": [
-                {
-                  "key": "format",
-                  "value": "article"
-                }
-              ]
-            },
-            "header": []
-          }
-        },
-        {
-          "name": "Featured Content",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/content/featured/",
-            "header": []
-          }
-        },
-        {
-          "name": "Submit Content",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/content/create/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Understanding Financial Abuse\",\n  \"body\": \"Financial abuse includes controlling all household money...\",\n  \"format\": \"article\",\n  \"topic\": \"recognise\",\n  \"organisation\": 1\n}"
-            }
-          }
-        },
-        {
-          "name": "Rate Content",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/content/1/rate/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"rating\": 5\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Quizzes",
-      "item": [
-        {
-          "name": "List Quizzes",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/quizzes/",
-            "header": []
-          }
-        },
-        {
-          "name": "Record Completion",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/quizzes/1/complete/",
-            "header": []
-          }
-        }
-      ]
-    },
-    {
-      "name": "Donations",
-      "item": [
-        {
-          "name": "Initiate Donation",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/donations/initiate/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"organisation_id\": 1,\n  \"amount\": 500,\n  \"email\": \"donor@example.com\",\n  \"callback_url\": \"http://localhost:8000/api/donations/verify/\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Verify Donation",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/donations/verify/?reference=ref_here",
-              "query": [
-                {
-                  "key": "reference",
-                  "value": "ref_here"
-                }
-              ]
-            },
-            "header": []
-          }
-        }
-      ]
-    },
-    {
-      "name": "Subscriptions",
-      "item": [
-        {
-          "name": "List Plans",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/subscriptions/plans/",
-            "header": []
-          }
-        },
-        {
-          "name": "Check Status",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/subscriptions/1/status/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Upgrade Plan",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/subscriptions/1/upgrade/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"plan\": \"ngo_pro\",\n  \"email\": \"org@example.com\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Verify Subscription Payment",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/subscriptions/1/verify/?reference=ref_here",
-              "query": [
-                {
-                  "key": "reference",
-                  "value": "ref_here"
-                }
-              ]
-            },
-            "header": []
-          }
-        }
-      ]
-    },
-    {
-      "name": "Analytics",
-      "item": [
-        {
-          "name": "County Summary CSV",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/analytics/county-summary/?days=30",
-              "query": [
-                {
-                  "key": "days",
-                  "value": "30"
-                }
-              ]
-            },
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Trend Report CSV",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/analytics/trend/?days=30",
-              "query": [
-                {
-                  "key": "days",
-                  "value": "30"
-                }
-              ]
-            },
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "County Official Heatmap",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/analytics/county-official/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
+            "url": "{{base_url}}/api/user-consent/accept/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{}"}
           }
         }
       ]
@@ -1347,20 +794,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/intelligence/keys/create/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Research Key\",\n  \"tier\": \"researcher\"\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Research Key\",\n  \"tier\": \"researcher\"\n}"}
           }
         },
         {
@@ -1368,68 +803,28 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/intelligence/keys/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "County Risk Scores",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/intelligence/county-risk/",
-            "header": [
-              {
-                "key": "X-API-Key",
-                "value": "{{api_key}}"
-              }
-            ]
-          }
+            "header": [{"key": "X-API-Key", "value": "{{api_key}}"}]}
         },
         {
-          "name": "Abuse Type Distribution",
+          "name": "Abuse Distribution",
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/intelligence/abuse-distribution/?county=Nairobi",
-              "query": [
-                {
-                  "key": "county",
-                  "value": "Nairobi"
-                }
-              ]
-            },
-            "header": [
-              {
-                "key": "X-API-Key",
-                "value": "{{api_key}}"
-              }
-            ]
-          }
+            "url": {"raw": "{{base_url}}/api/intelligence/abuse-distribution/?county=Nairobi", "query": [{"key": "county", "value": "Nairobi"}]},
+            "header": [{"key": "X-API-Key", "value": "{{api_key}}"}]}
         },
         {
           "name": "Trend Forecast",
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/intelligence/trend-forecast/?days=30",
-              "query": [
-                {
-                  "key": "days",
-                  "value": "30"
-                }
-              ]
-            },
-            "header": [
-              {
-                "key": "X-API-Key",
-                "value": "{{api_key}}"
-              }
-            ]
-          }
+            "url": {"raw": "{{base_url}}/api/intelligence/trend-forecast/?days=30", "query": [{"key": "days", "value": "30"}]},
+            "header": [{"key": "X-API-Key", "value": "{{api_key}}"}]}
         }
       ]
     },
@@ -1441,52 +836,28 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/notifications/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Mark All Read",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/notifications/read-all/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Mark One Read",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/notifications/1/read/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Audit Log (admin only)",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/notifications/audit/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         }
       ]
     },
@@ -1498,20 +869,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/panic/contacts/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"phone\": \"+254712345678\",\n  \"relation\": \"sister\"\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Jane Doe\",\n  \"phone\": \"+254712345678\",\n  \"relation\": \"sister\"\n}"}
           }
         },
         {
@@ -1519,46 +878,22 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/panic/contacts/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Delete Contact",
           "request": {
             "method": "DELETE",
             "url": "{{base_url}}/api/panic/contacts/1/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Trigger Panic Alert",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/panic/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"location\": \"Westlands, Nairobi\"\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"location\": \"Westlands, Nairobi\"\n}"}
           }
         }
       ]
@@ -1571,24 +906,15 @@
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/cases/NBI00001/",
-            "header": []
-          }
+            "header": []}
         },
         {
           "name": "Add Case Update",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/cases/NBI00001/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"update_type\": \"legal\",\n  \"notes\": \"Contacted FIDA Kenya, appointment booked for Friday.\"\n}"
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"update_type\": \"legal\",\n  \"notes\": \"Contacted FIDA Kenya, appointment booked for Friday.\"\n}"}
           }
         }
       ]
@@ -1601,66 +927,365 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/referrals/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"from_org\": 1,\n  \"to_org\": 2,\n  \"ref_code\": \"NBI00001\",\n  \"reason\": \"Survivor needs legal aid, referring to FIDA Kenya.\"\n}"
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"from_org\": 1,\n  \"to_org\": 2,\n  \"ref_code\": \"NBI00001\",\n  \"reason\": \"Survivor needs legal aid, referring to FIDA Kenya.\"\n}"}
           }
         },
         {
           "name": "List Referrals",
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/referrals/list/?org_id=1&direction=both",
-              "query": [
-                {
-                  "key": "org_id",
-                  "value": "1"
-                },
-                {
-                  "key": "direction",
-                  "value": "both"
-                }
-              ]
-            },
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
+            "url": {"raw": "{{base_url}}/api/referrals/list/?org_id=1&direction=both", "query": [{"key": "org_id", "value": "1"}, {"key": "direction", "value": "both"}]},
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
         },
         {
           "name": "Update Referral Status",
           "request": {
             "method": "PATCH",
             "url": "{{base_url}}/api/referrals/1/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"accepted\",\n  \"notes\": \"Case received, appointment scheduled.\"\n}"
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{access_token}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"status\": \"accepted\",\n  \"notes\": \"Case received, appointment scheduled.\"\n}"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Donations",
+      "item": [
+        {
+          "name": "Initiate Donation",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/donations/initiate/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"organisation_id\": 1,\n  \"amount\": 500,\n  \"email\": \"donor@example.com\",\n  \"callback_url\": \"http://localhost:8000/api/donations/verify/\"\n}"}
+          }
+        },
+        {
+          "name": "Verify Donation",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/donations/verify/?reference=ref_here", "query": [{"key": "reference", "value": "ref_here"}]},
+            "header": []}
+        },
+        {
+          "name": "List Donations",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/donations/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Donation Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/donations/stats/",
+            "header": []}
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "List Plans",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/subscriptions/plans/",
+            "header": []}
+        },
+        {
+          "name": "Get My Subscription",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/subscriptions/subscriptions/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Upgrade Plan",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/subscriptions/subscriptions/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"plan\": \"pro\",\n  \"payment_reference\": \"MPESA_REF_123\"\n}"}
+          }
+        },
+        {
+          "name": "Verify Subscription Payment",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/subscriptions/1/verify/?reference=ref_here", "query": [{"key": "reference", "value": "ref_here"}]},
+            "header": []}
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/payments/initiate/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"amount\": 5000,\n  \"payment_method\": \"mpesa\"\n}"}
+          }
+        },
+        {
+          "name": "Verify Payment",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/payments/1/verify/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "List Payments",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/payments/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        }
+      ]
+    },
+    {
+      "name": "Licensing",
+      "item": [
+        {
+          "name": "Get License Status",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/licensing/status/",
+            "header": []}
+        },
+        {
+          "name": "Get License Key",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/licensing/activate/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"license_key\": \"ABCD-EFGH-IJKL-MNOP\",\n  \"organization\": \"Test NGO\"\n}"}
+          }
+        },
+        {
+          "name": "Renew License",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/licensing/renew/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"license_key\": \"ABCD-EFGH-IJKL-MNOP\",\n  \"payment_reference\": \"PAY_REF_123\"\n}"}
+          }
+        },
+        {
+          "name": "List Licenses (Admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/licensing/licenses/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        }
+      ]
+    },
+    {
+      "name": "FAQ & Resources",
+      "item": [
+        {
+          "name": "List FAQs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/faq/",
+            "header": []}
+        },
+        {
+          "name": "Filter FAQs by Category",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/faq/?category=reporting", "query": [{"key": "category", "value": "reporting"}]},
+            "header": []}
+        },
+        {
+          "name": "List Resources",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/resources/",
+            "header": []}
+        },
+        {
+          "name": "Filter Resources",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/resources/?category=safety_plan", "query": [{"key": "category", "value": "safety_plan"}]},
+            "header": []}
+        },
+        {
+          "name": "Download Resource",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/resources/1/download/",
+            "header": []}
+        }
+      ]
+    },
+    {
+      "name": "Success Stories",
+      "item": [
+        {
+          "name": "List Stories",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/stories/",
+            "header": []}
+        },
+        {
+          "name": "Submit Story",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/stories/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"title\": \"My Journey to Healing\",\n  \"content\": \"I found help through AmakaziWatch...\",\n  \"is_anonymous\": true,\n  \"category\": \"survivor\"\n}"}
+          }
+        },
+        {
+          "name": "Approve Story (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/stories/1/approve/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        }
+      ]
+    },
+    {
+      "name": "Language",
+      "item": [
+        {
+          "name": "Switch to English",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/language/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"language\": \"en\"\n}"}
+          }
+        },
+        {
+          "name": "Switch to Swahili",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/language/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"language\": \"sw\"\n}"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Chat",
+      "item": [
+        {
+          "name": "Chatbot",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/chat/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"message\": \"I need help with domestic violence\",\n  \"history\": []\n}"}
+          }
+        },
+        {
+          "name": "Chatbot with History",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/chat/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"message\": \"What should I do?\",\n  \"history\": [\n    {\"role\": \"user\", \"content\": \"I need help with domestic violence\"},\n    {\"role\": \"assistant\", \"content\": \"I understand you're going through a difficult time...\"}\n  ]\n}"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Search Everything",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/search/?q=Nairobi", "query": [{"key": "q", "value": "Nairobi"}]},
+            "header": []}
+        },
+        {
+          "name": "Search Reports",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/search/reports/?q=assault", "query": [{"key": "q", "value": "assault"}]},
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Search Organisations",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/search/organisations/?q=legal", "query": [{"key": "q", "value": "legal"}]},
+            "header": []}
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "County Summary CSV",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/analytics/county-summary/?days=30", "query": [{"key": "days", "value": "30"}]},
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Trend Report CSV",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/analytics/trend/?days=30", "query": [{"key": "days", "value": "30"}]},
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "County Official Heatmap",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/analytics/county-official/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        },
+        {
+          "name": "Export Reports Data",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/analytics/export/?format=csv&days=90", "query": [{"key": "format", "value": "csv"}, {"key": "days", "value": "90"}]},
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}]}
+        }
+      ]
+    },
+    {
+      "name": "API Documentation",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/docs/",
+            "header": []}
+        },
+        {
+          "name": "OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/schema/",
+            "header": []}
+        }
+      ]
+    },
+    {
+      "name": "Bulk SMS",
+      "item": [
+        {
+          "name": "Send Bulk SMS (admin only)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/sms/blast/",
+            "header": [{"key": "Authorization", "value": "Bearer {{access_token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"message\": \"GBV awareness campaign: Know your rights. Call 1195 for help.\",\n  \"county\": \"Nairobi\",\n  \"phones\": [\"+254712345678\", \"+254798765432\"]\n}"}
           }
         }
       ]
@@ -1673,29 +1298,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/voice/callback/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sessionId\": \"ATVoice_test_123\",\n  \"callerNumber\": \"+254712345678\",\n  \"isActive\": \"1\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Voice Reports List (admin)",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/voice/reports/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"sessionId\": \"ATVoice_test_123\",\n  \"callerNumber\": \"+254712345678\",\n  \"isActive\": \"1\"\n}"}
           }
         },
         {
@@ -1703,557 +1307,26 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/whatsapp/webhook/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"from\": \"+254712345678\",\n  \"text\": \"HELP\"\n}"
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"from\": \"+254712345678\",\n  \"text\": \"HELP\"\n}"}
           }
         },
         {
-          "name": "WhatsApp \u2014 REPORT",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/whatsapp/webhook/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"from\": \"+254712345678\",\n  \"text\": \"REPORT\"\n}"
-            }
-          }
-        },
-        {
-          "name": "WhatsApp \u2014 FIND county",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/whatsapp/webhook/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"from\": \"+254712345678\",\n  \"text\": \"FIND Nairobi\"\n}"
-            }
-          }
-        },
-        {
-          "name": "WhatsApp \u2014 STATUS",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/whatsapp/webhook/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"from\": \"+254712345678\",\n  \"text\": \"STATUS NBI00001\"\n}"
-            }
-          }
-        },
-        {
-          "name": "USSD \u2014 Main Menu",
+          "name": "USSD - Main Menu",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/ussd/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sessionId\": \"ATUssd_test_001\",\n  \"phoneNumber\": \"+254712345678\",\n  \"networkCode\": \"63902\",\n  \"text\": \"\"\n}"
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"sessionId\": \"ATUssd_test_001\",\n  \"phoneNumber\": \"+254712345678\",\n  \"networkCode\": \"63902\",\n  \"text\": \"\"\n}"}
           }
         },
         {
-          "name": "USSD \u2014 Report Flow",
+          "name": "USSD - Report Flow",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/ussd/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sessionId\": \"ATUssd_test_001\",\n  \"phoneNumber\": \"+254712345678\",\n  \"networkCode\": \"63902\",\n  \"text\": \"1*1*1\"\n}"
-            }
-          }
-        },
-        {
-          "name": "USSD \u2014 Find Help",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/ussd/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sessionId\": \"ATUssd_test_002\",\n  \"phoneNumber\": \"+254712345678\",\n  \"networkCode\": \"63902\",\n  \"text\": \"2*1\"\n}"
-            }
-          }
-        },
-        {
-          "name": "USSD \u2014 Emergency Numbers",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/ussd/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sessionId\": \"ATUssd_test_003\",\n  \"phoneNumber\": \"+254712345678\",\n  \"networkCode\": \"63902\",\n  \"text\": \"4\"\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Bulk SMS",
-      "item": [
-        {
-          "name": "Send Bulk SMS (admin only)",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/sms/blast/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"message\": \"GBV awareness campaign: Know your rights. Call 1195 for help.\",\n  \"county\": \"Nairobi\",\n  \"phones\": [\"+254712345678\", \"+254798765432\"]\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Language",
-      "item": [
-        {
-          "name": "Switch to Swahili",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/language/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"language\": \"sw\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Switch to English",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/language/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"language\": \"en\"\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Search & Profile",
-      "item": [
-        {
-          "name": "Search Everything",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/search/?q=Nairobi",
-              "query": [
-                {
-                  "key": "q",
-                  "value": "Nairobi"
-                }
-              ]
-            },
-            "header": []
-          }
-        },
-        {
-          "name": "Get Profile",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/profile/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Update Profile",
-          "request": {
-            "method": "PATCH",
-            "url": "{{base_url}}/api/profile/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"county\": \"Nairobi\",\n  \"bio\": \"Community health worker.\"\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "AI Chat",
-      "item": [
-        {
-          "name": "Anonymous Chatbot",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/chat/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"message\": \"Is it normal for my partner to check my phone every day?\",\n  \"history\": []\n}"
-            }
-          }
-        },
-        {
-          "name": "Chatbot with History",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/chat/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"message\": \"What should I do about it?\",\n  \"history\": [\n    {\"role\": \"user\", \"content\": \"Is it normal for my partner to check my phone every day?\"},\n    {\"role\": \"assistant\", \"content\": \"Constantly checking your phone without permission can be controlling behaviour...\"}\n  ]\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "API Docs",
-      "item": [
-        {
-          "name": "Swagger UI",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/docs/",
-            "header": []
-          }
-        },
-        {
-          "name": "OpenAPI Schema",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/schema/",
-            "header": []
-          }
-        }
-      ]
-    },
-    {
-      "name": "Privacy & Data Export",
-      "item": [
-        {
-          "name": "Privacy Policy - View Current",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/privacy-policy/current/",
-            "header": []
-          }
-        },
-        {
-          "name": "Privacy Policy - Accept",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/user-consent/accept/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            }
-          }
-        },
-        {
-          "name": "Data Export - Request",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/export/request/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"format\": \"json\"\n}"
-            }
-          }
-        },
-        {
-          "name": "SOS Broadcast",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/sos/broadcast/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"location\": \"Westlands, Nairobi\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Shelter Booking",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/shelter/booking/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"organisation_id\": 1,\n  \"check_in\": \"2025-01-20T14:00:00\",\n  \"duration_days\": 3\n}"
-            }
-          }
-        },
-        {
-          "name": "Police Report - Generate P3",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/police-report/generate/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"case_ref\": \"NBI00001\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Offline Report - Queue",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/offline/queue/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"report_data\": {\n    \"abuse_type\": \"physical\",\n    \"description\": \"Assault occurred\",\n    \"county\": \"Nairobi\"\n  },\n  \"device_id\": \"mobile123\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Activity Feed - Get My Feed",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/activity-feed/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Register as Counsellor",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/counsellor/register/",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"specialization\": \"trauma\",\n  \"experience_years\": 3,\n  \"availability\": [\"Mon\", \"Wed\", \"Fri\"]\n}"
-            }
-          }
-        },
-        {
-          "name": "Admin - List All Users",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/admin/users/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Admin - System Stats",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/admin/stats/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Notifications - Mark All Read",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/notifications/read-all/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Notifications - Delete All Read",
-          "request": {
-            "method": "DELETE",
-            "url": "{{base_url}}/api/notifications/clear-read/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Terms of Service - View Current",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/terms/",
-            "header": []
-          }
-        },
-        {
-          "name": "Terms of Service - Accept",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/terms/accept/",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"sessionId\": \"ATUssd_test_001\",\n  \"phoneNumber\": \"+254712345678\",\n  \"networkCode\": \"63902\",\n  \"text\": \"1*1*1\"\n}"}
           }
         }
       ]

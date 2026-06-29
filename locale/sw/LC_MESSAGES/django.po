@@ -1,26 +1,68 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-14 23:26+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Project-Id-Version: AmakaziWatch\n"
+"Language: sw\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: amakaziwatch/settings.py:105
-msgid "English"
-msgstr ""
 
-#: amakaziwatch/settings.py:106
-msgid "Swahili"
-msgstr ""
+# Common messages
+msgid "Physical Abuse"
+msgstr "Unyanyasaji wa Kimwili"
+
+msgid "Sexual Abuse"
+msgstr "Unyanyasaji wa Kijinsia"
+
+msgid "Emotional Abuse"
+msgstr "Unyanyasaji wa Kihisia"
+
+msgid "Economic Abuse"
+msgstr "Unyanyasaji wa Kiuchumi"
+
+msgid "Digital Abuse"
+msgstr "Unyanyasaji wa Kidijitali"
+
+msgid "Report submitted successfully"
+msgstr "Ripoti imetumwa kikamilifu"
+
+msgid "Call 1195 for help"
+msgstr "Piga 1195 kwa usaidizi"
+
+msgid "Welcome to AmakaziWatch"
+msgstr "Karibu AmakaziWatch"
+
+msgid "Login"
+msgstr "Ingia"
+
+msgid "Register"
+msgstr "Jisajili"
+
+msgid "Logout"
+msgstr "Toka"
+
+msgid "Profile"
+msgstr "Wasifu"
+
+msgid "Settings"
+msgstr "Mipangilio"
+
+msgid "Help"
+msgstr "Usaidizi"
+
+msgid "Emergency"
+msgstr "Dharura"
+
+msgid "Report"
+msgstr "Ripoti"
+
+msgid "View Reports"
+msgstr "Angalia Ripoti"
+
+msgid "Organizations"
+msgstr "Mashirika"
+
+msgid "Education"
+msgstr "Elimu"
+
+msgid "Safety"
+msgstr "Usalama"

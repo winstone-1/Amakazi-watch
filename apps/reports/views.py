@@ -1,44 +1,16 @@
-from django.http import JsonResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from django.db.models import Count
+from .models import Report
 
-def home(request):
-    return JsonResponse({
-        "name": "AmakaziWatch API",
-        "description": "GBV Awareness, Reporting and Prevention Platform for Kenya",
-        "version": "1.0.0",
-        "status": "running",
-        "swagger": "/swagger/",
-        "docs": "/docs/",
-        "redoc": "/redoc/",
-        "schema": "/api/schema/",
-        "endpoints": {
-            "auth": {
-                "register": "/api/auth/register/",
-                "login": "/api/auth/token/",
-                "refresh": "/api/auth/token/refresh/"
-            },
-            "reports": {
-                "submit": "/api/reports/",
-                "heatmap": "/api/reports/heatmap/"
-            },
-            "organisations": {
-                "list": "/api/organisations/",
-                "register": "/api/organisations/register/",
-                "map": "/api/organisations/map/",
-                "heatmap": "/api/organisations/heatmap/"
-            },
-            "content": {
-                "list": "/api/content/",
-                "create": "/api/content/create/",
-                "videos": "/api/content/videos/"
-            },
-            "quizzes": {
-                "list": "/api/quizzes/",
-                "complete": "/api/quizzes/<id>/complete/"
-            },
-            "donations": {
-                "initiate": "/api/donations/initiate/",
-                "verify": "/api/donations/verify/"
-            },
-            "chat": "/api/chat/"
+class ReportStatsView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        stats = {
+            'total_reports': Report.objects.count(),
+            'abuse_types': list(Report.objects.values('abuse_type').annotate(count=Count('id'))),
+            'counties': list(Report.objects.values('county').annotate(count=Count('id'))[:5])
         }
-    })
+        return Response(stats)

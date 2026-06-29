@@ -10,7 +10,7 @@ class CountyScorecard(models.Model):
     overall_score = models.FloatField()
     rank = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
-    
+
 class ScorecardHistory(models.Model):
     county = models.CharField(max_length=50)
     scorecard_data = models.JSONField()

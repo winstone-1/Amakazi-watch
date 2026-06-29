@@ -1,2 +1,5 @@
 from django.urls import path
-urlpatterns = []
+
+urlpatterns = [
+    # Add your organisation endpoints here
+]

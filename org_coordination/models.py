@@ -1,6 +1,6 @@
 from django.db import models
-from organisations.models import Organisation
 from django.conf import settings
+from organisations.models import Organisation
 
 class ResourceInventory(models.Model):
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)

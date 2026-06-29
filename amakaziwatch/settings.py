@@ -2,14 +2,17 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+import sys
 
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'drf_yasg',
@@ -20,7 +23,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    # Third-party
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -31,7 +33,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    # Local apps
+    'django_filters',
     'users',
     'reports',
     'organisations',
@@ -89,15 +91,14 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'amakaziwatch.wsgi.application'
 
-# ── PostgreSQL Database ──────────────────────────────────────────────────────
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':     os.getenv('DB_NAME', 'amakaziwatch'),
-        'USER':     os.getenv('DB_USER', 'amakaziwatch_user'),
+        'NAME': os.getenv('DB_NAME', 'amakaziwatch'),
+        'USER': os.getenv('DB_USER', 'amakaziwatch_user'),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST':     os.getenv('DB_HOST', 'localhost'),
-        'PORT':     os.getenv('DB_PORT', '5432'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
@@ -109,33 +110,27 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en'
-
-from django.utils.translation import gettext_lazy as _
 LANGUAGES = [
-    ('en', _('English')),
-    ('sw', _('Swahili')),
+    ('en', 'English'),
+    ('sw', 'Swahili'),
 ]
-
 LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ── Cloudinary ───────────────────────────────────────────────────────────────
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# ── DRF ──────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -144,64 +139,67 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '30/hour',
-        'user': '100/hour',
+        'anon': '100/day',
+        'user': '1000/day',
     },
 }
 
-# ── JWT ───────────────────────────────────────────────────────────────────────
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME':  timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-# ── Swagger ───────────────────────────────────────────────────────────────────
 SPECTACULAR_SETTINGS = {
     'TITLE': 'AmakaziWatch API',
-    'DESCRIPTION': 'Kenya first crowdsourced GBV awareness, reporting and prevention platform. Built with Django REST Framework, Groq AI, Africa Talking SMS, Cloudinary and Paystack.',
+    'DESCRIPTION': 'Kenya first crowdsourced GBV awareness, reporting and prevention platform.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
     'COMPONENT_SPLIT_REQUEST': True,
-    'SECURITY': [{'BearerAuth': []}],
-    'SECURITY_SCHEMES': {
-        'BearerAuth': {
-            'type': 'http',
-            'scheme': 'bearer',
-            'bearerFormat': 'JWT',
-        },
-    },
-    'SWAGGER_UI_SETTINGS': {
-        'deepLinking': True,
-        'persistAuthorization': True,
-        'displayOperationId': False,
-        'defaultModelsExpandDepth': -1,
-        'docExpansion': 'list',
-        'filter': True,
-        'showExtensions': True,
-        'showCommonExtensions': True,
-    },
-    'TAGS': [
-        {'name': 'Auth', 'description': 'Registration, login, JWT tokens, password reset and 2FA'},
-        {'name': 'Reports', 'description': 'Anonymous incident reporting and heatmap data'},
-        {'name': 'Organisations', 'description': 'NGO and county government directory'},
-        {'name': 'Content', 'description': 'Education articles, guides and quizzes'},
-        {'name': 'Donations', 'description': 'Paystack donations to verified organisations'},
-        {'name': 'Analytics', 'description': 'Pandas CSV reports for NGO donor reporting'},
-        {'name': 'Chat', 'description': 'Anonymous AI chatbot powered by Groq LLaMA'},
-        {'name': 'Search', 'description': 'Search across organisations, content and quizzes'},
-        {'name': 'Profile', 'description': 'User profile and bookmarks'},
-    ],
 }
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = os.getenv(
-    'CORS_ALLOWED_ORIGINS', 'http://localhost:5173'
-).split()
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
 
 # ── Allauth ───────────────────────────────────────────────────────────────────
 AUTHENTICATION_BACKENDS = [
@@ -214,38 +212,38 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
             'client_id': os.getenv('GOOGLE_CLIENT_ID'),
-            'secret':    os.getenv('GOOGLE_CLIENT_SECRET'),
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),
             'key': ''
         }
     }
 }
 
 # ── Africa's Talking ──────────────────────────────────────────────────────────
-AT_API_KEY   = os.getenv('AT_API_KEY')
-AT_USERNAME  = os.getenv('AT_USERNAME', 'sandbox')
+AT_API_KEY = os.getenv('AT_API_KEY')
+AT_USERNAME = os.getenv('AT_USERNAME', 'sandbox')
 AT_SENDER_ID = os.getenv('AT_SENDER_ID', 'AmakaziWatch')
 AT_CALLER_ID = os.getenv('AT_CALLER_ID', '')
 
-# ── M-Pesa Daraja ─────────────────────────────────────────────────────────────
-MPESA_CONSUMER_KEY    = os.getenv('MPESA_CONSUMER_KEY')
+# ── M-Pesa ─────────────────────────────────────────────────────────────────────
+MPESA_CONSUMER_KEY = os.getenv('MPESA_CONSUMER_KEY')
 MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET')
-MPESA_SHORTCODE       = os.getenv('MPESA_SHORTCODE')
-MPESA_PASSKEY         = os.getenv('MPESA_PASSKEY')
-MPESA_CALLBACK_URL    = os.getenv('MPESA_CALLBACK_URL')
-MPESA_ENV             = os.getenv('MPESA_ENV', 'sandbox')
+MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE')
+MPESA_PASSKEY = os.getenv('MPESA_PASSKEY')
+MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL')
+MPESA_ENV = os.getenv('MPESA_ENV', 'sandbox')
 
 # ── Google ────────────────────────────────────────────────────────────────────
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
-YOUTUBE_API_KEY     = os.getenv('YOUTUBE_API_KEY')
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
-# ── GROQ ─────────────────────────────────────────────────────────────────
+# ── GROQ ──────────────────────────────────────────────────────────────────────
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
 # ── Paystack ──────────────────────────────────────────────────────────────────
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
 
-# ── Redis Cache ───────────────────────────────────────────────────────────────
+# ── Redis ──────────────────────────────────────────────────────────────────────
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -255,31 +253,18 @@ CACHES = {
         }
     }
 }
-CACHE_TTL = 60 * 5  # 5 minutes
+CACHE_TTL = 60 * 5
 
-
-# Media files for vault
+# ── Media ─────────────────────────────────────────────────────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/secure_vault/'
-# Add to amakaziwatch/settings.py
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter',
-    ],
-    'DEFAULT_CACHE_RESPONSE': {
-        'timeout': 300,  # 5 minutes
-        'cache': 'default',
-    },
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
-        'user': '1000/day'
-    }
-}
+
+# New Apps
+INSTALLED_APPS += [
+    'faq',
+    'resources',
+    'stories',
+    'payments',
+    'heatmap',
+    'admin_dashboard',
+]

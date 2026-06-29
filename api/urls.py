@@ -1,6 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import LanguageSwitchView
+from .views import LanguageSwitchView, ProfileView
+from .admin_views import AdminUserViewSet, AdminOrganisationViewSet, AdminReportViewSet
+from .terms_views import TermsOfServiceView, AcceptTermsView
+
+router = DefaultRouter()
+router.register(r'admin/users', AdminUserViewSet, basename='admin-users')
+router.register(r'admin/organisations', AdminOrganisationViewSet, basename='admin-orgs')
+router.register(r'admin/reports', AdminReportViewSet, basename='admin-reports')
 
 urlpatterns = [
     path('language/', LanguageSwitchView.as_view(), name='language-switch'),
@@ -17,29 +24,8 @@ urlpatterns = [
     path('workshops/', include('workshops.urls')),
     path('tips/', include('tips.urls')),
     path('scorecard/', include('county_scorecard.urls')),
-]
-from .admin_views import AdminUserViewSet, AdminOrganisationViewSet, AdminReportViewSet
-
-router = DefaultRouter()
-router.register(r'admin/users', AdminUserViewSet, basename='admin-users')
-router.register(r'admin/organisations', AdminOrganisationViewSet, basename='admin-orgs')
-router.register(r'admin/reports', AdminReportViewSet, basename='admin-reports')
-
-urlpatterns += [
-    path('', include(router.urls)),
-]
-from .terms_views import TermsOfServiceView, AcceptTermsView
-
-urlpatterns += [
+    path('profile/', ProfileView.as_view(), name='profile'),
     path('terms/', TermsOfServiceView.as_view(), name='terms'),
     path('terms/accept/', AcceptTermsView.as_view(), name='terms-accept'),
-]
-# Add new app URLs
-urlpatterns += [
-    path('notifications/', include('notifications.urls')),
-    path('intelligence/', include('intelligence.urls')),
-    path('faq/', include('faq.urls')),
-    path('resources/', include('resources.urls')),
-    path('stories/', include('stories.urls')),
-    path('payments/', include('payments.urls')),
+    path('', include(router.urls)),
 ]

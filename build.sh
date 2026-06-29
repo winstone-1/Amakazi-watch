@@ -3,12 +3,12 @@ set -o errexit
 
 pip install --upgrade pip
 pip install -r requirements.txt
-python manage.py collectstatic --noinput
 
-# Remove problematic migration if exists
-if [ -f "reports/migrations/0004_fix_report_models.py" ]; then
-    rm reports/migrations/0004_fix_report_models.py
-fi
+# Make migrations before running migrate
+python manage.py makemigrations --noinput
 
 # Run migrations
-python manage.py migrate
+python manage.py migrate --noinput
+
+# Collect static files
+python manage.py collectstatic --noinput

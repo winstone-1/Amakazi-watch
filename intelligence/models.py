@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+import uuid
 
 class APIKey(models.Model):
     TIER_CHOICES = [
@@ -9,7 +10,7 @@ class APIKey(models.Model):
     ]
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    key = models.CharField(max_length=64, unique=True)
+    key = models.CharField(max_length=64, unique=True, default=uuid.uuid4)
     tier = models.CharField(max_length=20, choices=TIER_CHOICES, default='free')
     requests_this_month = models.IntegerField(default=0)
     monthly_limit = models.IntegerField(default=1000)

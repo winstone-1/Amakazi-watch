@@ -28,8 +28,8 @@ class Subscription(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField(default=timezone.now)  # Added default
+    start_date = models.DateTimeField(default=timezone.now)  # Fixed: removed auto_now_add=True
+    end_date = models.DateTimeField(default=timezone.now)
     payment_reference = models.CharField(max_length=100, blank=True)
     
     def __str__(self):

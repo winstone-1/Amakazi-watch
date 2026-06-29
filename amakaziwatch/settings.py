@@ -3,6 +3,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 import os
 import sys
+import dj_database_url
 
 load_dotenv()
 
@@ -14,6 +15,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
 
+# ── INSTALLED APPS ─────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'drf_yasg',
     'django.contrib.admin',
@@ -55,10 +57,18 @@ INSTALLED_APPS = [
     'django_otp',
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_static',
+    'faq',
+    'resources',
+    'stories',
+    'payments',
+    'heatmap',
+    'admin_dashboard',
 ]
 
+# ── MIDDLEWARE ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -91,17 +101,28 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'amakaziwatch.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'amakaziwatch'),
-        'USER': os.getenv('DB_USER', 'amakaziwatch_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+# ── DATABASE ──────────────────────────────────────────────────────────────────
+if os.getenv('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'amakaziwatch'),
+            'USER': os.getenv('DB_USER', 'amakaziwatch_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
 
+# ── AUTH PASSWORD VALIDATORS ──────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -109,6 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# ── INTERNATIONALIZATION ──────────────────────────────────────────────────────
 LANGUAGE_CODE = 'en'
 LANGUAGES = [
     ('en', 'English'),
@@ -122,8 +144,10 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# ── CLOUDINARY ────────────────────────────────────────────────────────────────
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
@@ -131,6 +155,7 @@ CLOUDINARY_STORAGE = {
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+# ── REST FRAMEWORK ────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -199,9 +224,11 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'https://amakazi-watch.onrender.com',
+    'https://amakazi-watch.anandar.com',
 ]
 
-# ── Allauth ───────────────────────────────────────────────────────────────────
+# ── ALLAUTH ──────────────────────────────────────────────────────────────────
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -218,13 +245,12 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# ── Africa's Talking ──────────────────────────────────────────────────────────
+# ── THIRD PARTY API KEYS ─────────────────────────────────────────────────────
 AT_API_KEY = os.getenv('AT_API_KEY')
 AT_USERNAME = os.getenv('AT_USERNAME', 'sandbox')
 AT_SENDER_ID = os.getenv('AT_SENDER_ID', 'AmakaziWatch')
 AT_CALLER_ID = os.getenv('AT_CALLER_ID', '')
 
-# ── M-Pesa ─────────────────────────────────────────────────────────────────────
 MPESA_CONSUMER_KEY = os.getenv('MPESA_CONSUMER_KEY')
 MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET')
 MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE')
@@ -232,18 +258,14 @@ MPESA_PASSKEY = os.getenv('MPESA_PASSKEY')
 MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL')
 MPESA_ENV = os.getenv('MPESA_ENV', 'sandbox')
 
-# ── Google ────────────────────────────────────────────────────────────────────
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
-
-# ── GROQ ──────────────────────────────────────────────────────────────────────
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
-# ── Paystack ──────────────────────────────────────────────────────────────────
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
 
-# ── Redis ──────────────────────────────────────────────────────────────────────
+# ── REDIS ─────────────────────────────────────────────────────────────────────
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -255,57 +277,13 @@ CACHES = {
 }
 CACHE_TTL = 60 * 5
 
-# ── Media ─────────────────────────────────────────────────────────────────────
+# ── MEDIA ─────────────────────────────────────────────────────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/secure_vault/'
 
-# New Apps
-INSTALLED_APPS += [
-    'faq',
-    'resources',
-    'stories',
-    'payments',
-    'heatmap',
-    'admin_dashboard',
-]
-
-# Render PostgreSQL Database
-import dj_database_url
-
-# Update DATABASES to use Render PostgreSQL if DATABASE_URL exists
-if os.getenv('DATABASE_URL'):
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
-
-# Render PostgreSQL Database
-import dj_database_url
-
-# Production settings
+# ── RENDER PRODUCTION SETTINGS ──────────────────────────────────────────────
 RENDER = os.getenv('RENDER', 'False') == 'True'
 
-if os.getenv('DATABASE_URL'):
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
-
-# Allow Render host
 if RENDER:
     ALLOWED_HOSTS = ['*']
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Static files for production
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Add WhiteNoise to middleware
-MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')

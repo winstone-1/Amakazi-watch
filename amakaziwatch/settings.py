@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'workshops',
     'tips',
     'county_scorecard',
-    'subscriptions',
     'intelligence',
     'notifications',
     'rosetta',

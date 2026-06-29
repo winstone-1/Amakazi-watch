@@ -37,7 +37,6 @@ urlpatterns += [
 # Add new app URLs
 urlpatterns += [
     path('notifications/', include('notifications.urls')),
-    path('subscriptions/', include('subscriptions.urls')),
     path('intelligence/', include('intelligence.urls')),
     path('faq/', include('faq.urls')),
     path('resources/', include('resources.urls')),

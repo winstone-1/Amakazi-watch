@@ -1,9 +1,8 @@
-import uuid
 from django.db import models
 from django.conf import settings
 
 class IncidentReport(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Use UUID properly
+    id = models.BigAutoField(primary_key=True)
     ABUSE_TYPES = [
         ('physical', 'Physical Abuse'),
         ('sexual', 'Sexual Abuse'),
@@ -45,7 +44,7 @@ class IncidentReport(models.Model):
         return f"{self.get_abuse_type_display()} - {self.county} ({self.created_at.date()})"
 
 class Report(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Use UUID properly
+    id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     abuse_type = models.CharField(max_length=50)
     county = models.CharField(max_length=50)

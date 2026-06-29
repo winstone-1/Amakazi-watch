@@ -1,132 +1,163 @@
 # AmakaziWatch Backend API
 
 > Kenya's first crowdsourced GBV awareness, reporting and prevention platform.
-> Built with Django + Django REST Framework.
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [API Endpoints](#api-endpoints)
-- [Running Tests](#running-tests)
-- [Deployment](#deployment)
-- [Author](#author)
-
----
 
 ## Overview
 
-AmakaziWatch is a REST API backend that powers a GBV (Gender-Based Violence) awareness and prevention platform for Kenya. It enables:
-
-- **Anonymous incident reporting** with SMS case reference via Africa's Talking
-- **AI-powered report classification** using Groq LLM — urgency scoring and flagging
-- **Live county heatmap** of anonymised reports for NGOs and county officials
-- **Organisation directory** for NGOs, legal aid clinics and county government offices
-- **Education hub** with articles, guides, YouTube videos and gamified quizzes
-- **Paystack donations** directly to verified organisations
-- **Pandas CSV analytics** — county summaries and trend reports for NGO donor reporting
-- **Anonymous AI chatbot** for trauma-informed GBV support
-- **JWT authentication** with role-based access control (RBAC)
-- **Two-factor authentication** (TOTP) for admin and county official accounts
-- **Password reset and change** endpoints
-- **Safety features** — safety timer, safe word alerts, risk assessment, escape plan generator
-- **Document vault** — encrypted evidence storage with court-ready metadata
-- **Peer support network** — anonymous chat with trained supporters
-- **Legal rights bot** — Kenyan GBV law chatbot with legal references
-- **Organization coordination** — resource inventory, AI case matching, inter-org messaging
-- **Campaign manager** — multi-channel awareness campaigns (SMS, WhatsApp)
-- **Virtual workshops** — live and recorded training sessions
-- **Anonymous tips** — third-party reporting system
-- **County scorecards** — performance tracking and rankings
-- **Privacy policy** — user consent tracking (GDPR compliant)
-- **Data export** — users can download their data (JSON/CSV)
-- **SOS broadcast** — immediate multi-channel emergency response
-- **Shelter booking** — direct emergency shelter reservations
-- **Police report generation** — automated P3 form generation
-- **Offline queue** — report submission without internet connection
-
----
+AmakaziWatch is a Django REST Framework API that powers a comprehensive GBV (Gender-Based Violence) awareness and prevention platform for Kenya. It enables anonymous incident reporting, AI-powered classification, live heatmaps, organization coordination, and survivor safety tools.
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Django 5 + Django REST Framework |
-| Database | PostgreSQL / MySQL |
-| Auth | SimpleJWT + django-allauth (Google OAuth) + django-otp (2FA) |
-| File Storage | Cloudinary / Local (encrypted vault) |
-| SMS | Africa's Talking SMS API |
-| Payments | Paystack |
-| Maps | Google Maps JavaScript API / Leaflet |
-| AI | Groq API (LLaMA 3.3 70B) |
-| Analytics | Pandas |
-| API Docs | drf-spectacular + drf-yasg (Swagger UI, ReDoc) |
-| Testing | pytest-django |
-| Deployment | Render + Docker |
+* **Framework**: Django 6.0.5 + Django REST Framework 3.17.1
+* **Database**: PostgreSQL (Render)
+* **Auth**: JWT + Google OAuth + 2FA (TOTP)
+* **File Storage**: Cloudinary
+* **SMS**: Africa's Talking
+* **Payments**: Paystack
+* **AI**: Groq API (LLaMA)
+* **Analytics**: Pandas
+* **Deployment**: Render + Docker
 
----
+## API Endpoints
 
+| Category         | Endpoint                       | Method          | Auth      |
+| ---------------- | ------------------------------ | --------------- | --------- |
+| Auth             | `/api/auth/register/`          | POST            | None      |
+| Auth             | `/api/auth/token/`             | POST            | None      |
+| Auth             | `/api/auth/token/refresh/`     | POST            | None      |
+| Auth             | `/api/auth/password-reset/`    | POST            | None      |
+| Auth             | `/api/auth/password-change/`   | POST            | Bearer    |
+| Auth             | `/api/auth/2fa/*`              | GET/POST        | Bearer    |
+| Profile          | `/api/profile/`                | GET/PATCH       | Bearer    |
+| Reports          | `/api/reports/`                | GET/POST        | Optional  |
+| Reports          | `/api/reports/stats/`          | GET             | None      |
+| Reports          | `/api/reports/heatmap/`        | GET             | Bearer    |
+| Safety           | `/api/safety/timer/*`          | POST            | Bearer    |
+| Safety           | `/api/safety/safe-word/*`      | POST            | Bearer    |
+| Safety           | `/api/safety/risk-assessment/` | POST            | Bearer    |
+| Safety           | `/api/safety/escape-plan/`     | POST            | Bearer    |
+| Vault            | `/api/vault/documents/*`       | GET/POST/DELETE | Bearer    |
+| Peer Support     | `/api/peer/sessions/*`         | GET/POST        | Bearer    |
+| Legal Bot        | `/api/legal/ask/`              | POST            | None      |
+| Organisations    | `/api/organisations/`          | GET/POST        | Optional  |
+| Org Coordination | `/api/org/inventory/*`         | GET/POST        | Bearer    |
+| Org Coordination | `/api/org/case-matching/`      | POST            | Bearer    |
+| Content          | `/api/content/`                | GET             | None      |
+| Campaigns        | `/api/campaigns/`              | GET/POST        | Bearer    |
+| Workshops        | `/api/workshops/`              | GET/POST        | Bearer    |
+| Tips             | `/api/tips/`                   | POST            | None      |
+| Scorecards       | `/api/scorecard/rankings/`     | GET             | None      |
+| Admin            | `/api/admin/*`                 | GET/POST        | Admin     |
+| Terms            | `/api/terms/`                  | GET             | None      |
+| Privacy          | `/api/privacy-policy/current/` | GET             | None      |
+| Intelligence     | `/api/intelligence/*`          | GET             | X-API-Key |
+| Chat             | `/api/chat/`                   | POST            | None      |
+| Panic            | `/api/panic/`                  | POST            | Bearer    |
+| Notifications    | `/api/notifications/`          | GET             | Bearer    |
 
----
-
-## Getting Started
+## Installation
 
 ### Prerequisites
 
-- Python 3.12
-- PostgreSQL or MySQL
-- Git
+* Python 3.12+
+* PostgreSQL
+* Git
 
-### Installation
+### Setup
 
-**1. Clone the repository**
 ```bash
-git clone https://github.com/winstone-1/amakaziwatch.git
-cd amakaziwatch
-```
-```
-python3.12 -m venv venv
-source venv/bin/activate        # Linux/Mac
-venv\Scripts\activate           # Windows Git Bash
-```
-```
+git clone https://github.com/winstone-1/Amakazi-watch.git
+cd Amakazi-watch
+
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
 pip install -r requirements.txt
-```
-```
+
 cp .env.example .env
-# Edit .env with your credentials
-nano .env
-```
-```
-sudo mysql
-```
-```
-CREATE DATABASE amakaziwatch CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'amakaziwatch_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON amakaziwatch.* TO 'amakaziwatch_user'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-```
+
+python manage.py makemigrations
 python manage.py migrate
-```
-```
+
+python manage.py createsuperuser
+
 python manage.py runserver
 ```
+
+## Environment Variables
+
+```env
+# Django
+SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost 127.0.0.1
+
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/amakaziwatch
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# Africa's Talking
+AT_API_KEY=your-at-key
+AT_USERNAME=sandbox
+AT_SENDER_ID=AmakaziWatch
+
+# Paystack
+PAYSTACK_SECRET_KEY=your-paystack-key
+PAYSTACK_PUBLIC_KEY=your-paystack-public-key
+
+# Google
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Groq
+GROQ_API_KEY=your-groq-key
 ```
-API root: http://127.0.0.1:8000/api
+
+## Docker
+
+```bash
+docker-compose up --build
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py createsuperuser
 ```
+
+## Testing
+
+```bash
+pytest
+pytest --cov=.
 ```
-Swagger docs: http://127.0.0.1:8000/swagger/
+
+## Deployment
+
+### Render
+
+* Push code to GitHub
+* Create Web Service
+* Build: `./build.sh`
+* Start: `gunicorn amakaziwatch.wsgi:application`
+* Add environment variables
+
+### Docker
+
+```bash
+docker build -t amakazi-watch-api .
+docker run -p 8000:8000 amakazi-watch-api
 ```
-```
-ReDoc: http://127.0.0.1:8000/redoc/
-```
-```
-Admin panel: http://127.0.0.1:8000/admin/
-```
+
+## Documentation
+
+* Swagger: `/swagger/`
+* ReDoc: `/redoc/`
+* Schema: `/api/schema/`
+
+## License
+
+BSD License
+
+**Author:** Winstone Mwangi
+**GitHub:** @winstone-1

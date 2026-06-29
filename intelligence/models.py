@@ -9,6 +9,7 @@ class APIKey(models.Model):
         ('enterprise', 'Enterprise'),
     ]
     
+    id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     key = models.CharField(max_length=64, unique=True, default=uuid.uuid4)
     tier = models.CharField(max_length=20, choices=TIER_CHOICES, default='free')
@@ -22,6 +23,7 @@ class APIKey(models.Model):
         return f"{self.user.username} - {self.tier}"
 
 class APIUsageLog(models.Model):
+    id = models.BigAutoField(primary_key=True)
     api_key = models.ForeignKey(APIKey, on_delete=models.CASCADE)
     endpoint = models.CharField(max_length=200)
     requests_count = models.IntegerField(default=1)

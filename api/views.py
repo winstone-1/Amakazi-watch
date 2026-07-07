@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
+from django.http import JsonResponse
 
 User = get_user_model()
 
@@ -158,3 +159,10 @@ def api_root(request):
         'docs': '/docs/',
         'swagger': '/swagger/'
     })
+
+
+from django.http import JsonResponse
+
+def simple_health(request):
+    """Ultra-simple health check for Render"""
+    return JsonResponse({'status': 'ok'})

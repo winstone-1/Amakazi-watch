@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import LanguageSwitchView, ProfileView, PanicAlertView, health_check
+from .views import LanguageSwitchView, ProfileView, PanicAlertView
+from .views import health_check  # ← Make sure this is imported
 from .admin_views import AdminUserViewSet, AdminOrganisationViewSet, AdminReportViewSet
 from .terms_views import TermsOfServiceView, AcceptTermsView
 
@@ -10,7 +11,7 @@ router.register(r'admin/organisations', AdminOrganisationViewSet, basename='admi
 router.register(r'admin/reports', AdminReportViewSet, basename='admin-reports')
 
 urlpatterns = [
-    # Health check (must be at root of api)
+    # Health check (must be first)
     path('health/', health_check, name='health_check'),
     
     # Other endpoints

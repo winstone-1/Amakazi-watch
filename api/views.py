@@ -1,7 +1,17 @@
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.utils import timezone
+from django.contrib.auth import get_user_model
+from rest_framework.views import APIView
+
+User = get_user_model()
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils import translation
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 from api.logging import log_action
@@ -68,3 +78,83 @@ class PanicAlertView(APIView):
         result = send_panic_alert(request.user, location=request.data.get('location'))
         log_action('panic_alert', user=request.user, details={'location': request.data.get('location')})
         return Response(result)
+
+@api_view(['GET'])
+def health_check(request):
+    """Health check endpoint for Render"""
+    return Response({
+        'status': 'ok',
+        'timestamp': timezone.now().isoformat(),
+        'service': 'AmakaziWatch API'
+    })
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register(request):
+    """User registration endpoint"""
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
+    phone = request.data.get('phone', '')
+    county = request.data.get('county', '')
+    
+    if not username or not email or not password:
+        return Response({'error': 'Username, email and password required'}, status=400)
+    
+    if User.objects.filter(username=username).exists():
+        return Response({'error': 'Username already exists'}, status=400)
+    
+    if User.objects.filter(email=email).exists():
+        return Response({'error': 'Email already exists'}, status=400)
+    
+    user = User.objects.create_user(
+        username=username,
+        email=email,
+        password=password,
+        phone=phone,
+        county=county
+    )
+    return Response({
+        'message': 'User created successfully',
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'phone': user.phone,
+            'county': user.county,
+            'role': user.role
+        }
+    }, status=201)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    """Get user profile"""
+    user = request.user
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'phone': user.phone,
+        'county': user.county,
+        'role': user.role,
+        'bio': user.bio,
+        'date_joined': user.date_joined
+    })
+
+
+@api_view(['GET'])
+def api_root(request):
+    """API root endpoint"""
+    return Response({
+        'message': 'Welcome to AmakaziWatch API',
+        'endpoints': {
+            'health': '/api/health/',
+            'auth': '/api/auth/',
+            'reports': '/api/reports/',
+            'organisations': '/api/organisations/',
+        },
+        'docs': '/docs/',
+        'swagger': '/swagger/'
+    })

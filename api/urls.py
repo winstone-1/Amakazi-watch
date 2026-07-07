@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import LanguageSwitchView, ProfileView, PanicAlertView
+from .views import LanguageSwitchView, ProfileView, PanicAlertView, health_check
 from .admin_views import AdminUserViewSet, AdminOrganisationViewSet, AdminReportViewSet
 from .terms_views import TermsOfServiceView, AcceptTermsView
 
@@ -27,6 +27,7 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),
     path('donations/', include('donations.urls')),
     path('licensing/', include('licensing.urls')),
+    path('health/', health_check, name='health_check'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('panic/', PanicAlertView.as_view(), name='panic-alert'),
     path('terms/', TermsOfServiceView.as_view(), name='terms'),

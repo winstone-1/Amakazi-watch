@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .terms_models import TermsOfService, UserTermsAcceptance
 
+@extend_schema(exclude=True)
 class TermsOfServiceView(APIView):
     permission_classes = [AllowAny]
     
@@ -18,6 +20,7 @@ class TermsOfServiceView(APIView):
             })
         return Response({'error': 'Terms not found'}, status=404)
 
+@extend_schema(exclude=True)
 class AcceptTermsView(APIView):
     permission_classes = [IsAuthenticated]
     

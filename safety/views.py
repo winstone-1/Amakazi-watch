@@ -14,6 +14,8 @@ class SafetyTimerViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return self.queryset.none()
         return SafetyTimer.objects.filter(user=self.request.user)
     
     @action(detail=False, methods=['post'])
@@ -38,6 +40,8 @@ class SafeWordViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return self.queryset.none()
         return SafeWord.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
@@ -55,6 +59,8 @@ class RiskAssessmentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return self.queryset.none()
         return RiskAssessment.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
@@ -68,6 +74,8 @@ class EscapePlanViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return self.queryset.none()
         return EscapePlan.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):

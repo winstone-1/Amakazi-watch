@@ -4,11 +4,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema
 from django.http import JsonResponse
 
 User = get_user_model()
 
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils import translation
@@ -20,6 +22,7 @@ from api.logging import log_action
 User = get_user_model()
 
 
+@extend_schema(exclude=True)
 class LanguageSwitchView(APIView):
     permission_classes = [AllowAny]
 
@@ -33,6 +36,7 @@ class LanguageSwitchView(APIView):
         return Response({'error': 'Language must be en or sw'}, status=400)
 
 
+@extend_schema(exclude=True)
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -71,6 +75,7 @@ class ProfileView(APIView):
         })
 
 
+@extend_schema(exclude=True)
 class PanicAlertView(APIView):
     permission_classes = [IsAuthenticated]
 

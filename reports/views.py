@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.db.models import Count
@@ -7,6 +8,7 @@ from .serializers import IncidentReportSerializer
 from api.logging import log_action
 
 
+@extend_schema(exclude=True)
 class IncidentReportListView(APIView):
     permission_classes = [AllowAny]
 
@@ -24,6 +26,7 @@ class IncidentReportListView(APIView):
         return Response(serializer.errors, status=400)
 
 
+@extend_schema(exclude=True)
 class ReportStatsView(APIView):
     permission_classes = [AllowAny]
 

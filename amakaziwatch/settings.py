@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     'stories',
     'payments',
     'heatmap',
+    'donations',
+    'licensing',
     'admin_dashboard',
 ]
 
@@ -100,12 +102,15 @@ TEMPLATES = [{
 WSGI_APPLICATION = 'amakaziwatch.wsgi.application'
 
 # ── DATABASE ──────────────────────────────────────────────────────────────────
+# Only require SSL in production (not locally)
+SSL_REQUIRE = os.getenv('ENVIRONMENT') == 'production'
+
 if os.getenv('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
             conn_max_age=600,
-            ssl_require=True
+            ssl_require=SSL_REQUIRE  # Only SSL in production
         )
     }
 else:

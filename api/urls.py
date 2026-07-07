@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import LanguageSwitchView, ProfileView
+from .views import LanguageSwitchView, ProfileView, PanicAlertView
 from .admin_views import AdminUserViewSet, AdminOrganisationViewSet, AdminReportViewSet
 from .terms_views import TermsOfServiceView, AcceptTermsView
 
@@ -24,7 +24,11 @@ urlpatterns = [
     path('workshops/', include('workshops.urls')),
     path('tips/', include('tips.urls')),
     path('scorecard/', include('county_scorecard.urls')),
+    path('notifications/', include('notifications.urls')),
+    path('donations/', include('donations.urls')),
+    path('licensing/', include('licensing.urls')),
     path('profile/', ProfileView.as_view(), name='profile'),
+    path('panic/', PanicAlertView.as_view(), name='panic-alert'),
     path('terms/', TermsOfServiceView.as_view(), name='terms'),
     path('terms/accept/', AcceptTermsView.as_view(), name='terms-accept'),
     path('', include(router.urls)),

@@ -9,7 +9,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
-    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
@@ -17,9 +16,10 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
 
-COPY entrypoint.sh /entrypoint.sh
+# Use Render-specific entrypoint
+COPY entrypoint.render.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 8000
+EXPOSE $PORT
 
 ENTRYPOINT ["/entrypoint.sh"]

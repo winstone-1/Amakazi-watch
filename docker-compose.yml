@@ -25,6 +25,7 @@ services:
       - DEBUG=${DEBUG:-True}
       - ALLOWED_HOSTS=localhost,127.0.0.1
       - ENVIRONMENT=development
+      - PORT=8000
     depends_on:
       db:
         condition: service_healthy

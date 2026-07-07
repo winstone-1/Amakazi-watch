@@ -8,7 +8,8 @@ def home(request):
         'message': 'AmakaziWatch API is running!',
         'docs': '/docs/',
         'admin': '/admin/',
-        'health': '/health/'
+        'health': '/health/',
+        'api_health': '/api/health/'
     })
 
 def health_check(request):
@@ -16,7 +17,7 @@ def health_check(request):
 
 urlpatterns = [
     path("", home, name="home"),
-    path("health/", health_check, name="health"),  # ← Add this
+    path("health/", health_check, name="health"),
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

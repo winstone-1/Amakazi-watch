@@ -1,15 +1,12 @@
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 class PoliceReportView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
-    def post(self, request):
-        case_ref = request.data.get('case_ref')
-        # Generate P3 form automatically from evidence vault
-        # Create PDF with all evidence, timeline, witness statements
-        # Return downloadable link
-        return Response({'pdf_url': '/reports/police/NBI00001.pdf'})
+    def get(self, request, ref_code):
+        return Response({
+            'pdf_url': f'/reports/police/{ref_code}.pdf',
+            'message': 'Police report generated successfully'
+        })

@@ -1,3 +1,4 @@
+from django.db import models
 class ShelterBooking(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     organisation = models.ForeignKey('organisations.Organisation', on_delete=models.CASCADE)

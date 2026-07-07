@@ -7,11 +7,16 @@ def home(request):
     return JsonResponse({
         'message': 'AmakaziWatch API is running!',
         'docs': '/docs/',
-        'admin': '/admin/'
+        'admin': '/admin/',
+        'health': '/health/'
     })
+
+def health_check(request):
+    return JsonResponse({'status': 'ok', 'service': 'AmakaziWatch'})
 
 urlpatterns = [
     path("", home, name="home"),
+    path("health/", health_check, name="health"),  # ← Add this
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

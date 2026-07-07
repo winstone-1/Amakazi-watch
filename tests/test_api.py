@@ -21,7 +21,14 @@ def test_user(db):
 def auth_client(api_client, test_user):
     api_client.force_authenticate(user=test_user)
     return api_client
-
+def test_register(self):
+        response = self.client.post('/api/auth/register/', {
+            'username': 'testuser',
+            'email': 'test@test.com',
+            'password': 'Test@1234'
+        })
+        self.assertEqual(response.status_code, 201)
+        
 def test_safety_timer_start(auth_client):
     response = auth_client.post('/api/safety/timer/start/', {
         'duration_minutes': 30

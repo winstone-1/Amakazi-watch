@@ -2,30 +2,14 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import PeerSupporter, PeerSupportSession
-from .serializers import *
+from .serializers import PeerSupporterSerializer, PeerSupportSessionSerializer
 
 class PeerSupporterViewSet(viewsets.ModelViewSet):
+    queryset = PeerSupporter.objects.all()
     serializer_class = PeerSupporterSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        return PeerSupporter.objects.filter(user=self.request.user)
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 class PeerSupportSessionViewSet(viewsets.ModelViewSet):
+    queryset = PeerSupportSession.objects.all()
     serializer_class = PeerSupportSessionSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        return PeerSupportSession.objects.filter(survivor=self.request.user)
-    
-    @action(detail=False, methods=['post'])
-    def find(self, request):
-        # Match with available peer supporter
-        return Response({'message': 'Peer supporter found'})
-    
-    @action(detail=True, methods=['post'])
-    def message(self, request, pk=None):
-        session = self.get_object()
-        message = request.data.get('message')
-        # Store message in session
-        return Response({'message': 'Message sent'})

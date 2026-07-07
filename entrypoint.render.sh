@@ -3,16 +3,15 @@ set -e
 
 echo "🚀 Starting AmakaziWatch on Render..."
 
-# Check if DATABASE_URL is set
+# Check database
 if [ -z "$DATABASE_URL" ]; then
     echo "❌ DATABASE_URL is not set!"
-    echo "Please add DATABASE_URL to your Render environment variables."
     exit 1
 fi
 
 echo "✅ DATABASE_URL is set"
 
-# Wait for database to be ready (simple retry)
+# Wait for database
 echo "⏳ Checking database connection..."
 MAX_RETRIES=30
 RETRY_COUNT=0
@@ -37,9 +36,12 @@ python manage.py migrate --noinput
 echo "📁 Collecting static files..."
 python manage.py collectstatic --noinput
 
-# Create superuser if it doesn't exist (optional)
+# Create superuser (optional)
 echo "👤 Ensuring superuser exists..."
 python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'admin123') if not User.objects.filter(username='admin').exists() else None" 2>/dev/null || true
 
 echo "🚀 Starting Gunicorn..."
-exec gunicorn amakaziwatch.wsgi:application --bind 0.0.0.0:$PORT
+
+# Use PORT from environment or default to 10000
+PORT=${PORT:-10000}
+exec gunicorn amakaziwatch.wsgi:application --bind 0.0.0.0:$PORT --workers=2 --threads=4 --worker-class=sync --timeout=30

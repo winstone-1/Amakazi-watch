@@ -1,33 +1,21 @@
 from django.contrib import admin
 from django.urls import path, include
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-from rest_framework import permissions
-from api.root_views import RootAPIView
+from django.http import JsonResponse
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="AmakaziWatch API",
-        default_version='v3',
-        description="Kenya's first crowdsourced GBV awareness, reporting and prevention platform",
-        terms_of_service="https://www.amakaziwatch.com/terms/",
-        contact=openapi.Contact(email="support@amakaziwatch.com"),
-        license=openapi.License(name="BSD License"),
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+def home(request):
+    return JsonResponse({
+        'message': 'AmakaziWatch API is running!',
+        'docs': '/docs/',
+        'admin': '/admin/'
+    })
 
 urlpatterns = [
-    path('', RootAPIView.as_view(), name='home'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path("", home, name="home"),
     path("admin/", admin.site.urls),
-    path("rosetta/", include("rosetta.urls")),
-    path("accounts/", include("allauth.urls")),
     path("api/", include("api.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui-docs"),
     path("redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]

@@ -24,6 +24,12 @@ python manage.py migrate --noinput
 echo "📁 Collecting static files..."
 python manage.py collectstatic --noinput
 
-echo "🚀 Starting Gunicorn..."
+echo "🚀 Starting Gunicorn with CORS headers..."
 PORT=${PORT:-10000}
-exec gunicorn amakaziwatch.wsgi:application --bind 0.0.0.0:$PORT --workers=1 --threads=2 --timeout=30
+exec gunicorn amakaziwatch.wsgi:application \
+    --bind 0.0.0.0:$PORT \
+    --workers=1 \
+    --threads=2 \
+    --timeout=30 \
+    --access-logfile=- \
+    --error-logfile=-

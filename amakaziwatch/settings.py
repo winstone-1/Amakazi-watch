@@ -67,6 +67,7 @@ INSTALLED_APPS = [
 
 # ── MIDDLEWARE ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -291,3 +292,39 @@ RENDER = os.getenv('RENDER', 'False') == 'True'
 if RENDER:
     ALLOWED_HOSTS = ['*']
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
+# CORS Configuration
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8000",
+    "https://amakazi-watch.onrender.com",
+    "https://amakazi-watch.pages.dev",
+    "https://*.onrender.com",
+    "https://*.pages.dev",
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Additional security headers
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'

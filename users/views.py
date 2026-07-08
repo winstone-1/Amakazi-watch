@@ -1,64 +1,67 @@
-from rest_framework import generics, permissions, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
+from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
-
-from api.logging import log_action
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import get_user_model
+import requests
 
 User = get_user_model()
 
 
-class RegisterView(generics.CreateAPIView):
-    permission_classes = [permissions.AllowAny]
-
+class RegisterView(APIView):
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
         role = request.data.get('role', 'survivor')
-
-        if not username or not password:
-            return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-
+        
+        if not username or not email or not password:
+            return Response({'error': 'Username, email and password required'}, status=status.HTTP_400_BAD_REQUEST)
+        
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.create_user(username=username, email=email, password=password, role=role)
-        refresh = RefreshToken.for_user(user)
-
-        log_action('register', user=user, details={'role': role})
+        
+        if User.objects.filter(email=email).exists():
+            return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            role=role
+        )
+        
         return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
+            'message': 'User created successfully',
             'user': {
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'role': getattr(user, 'role', 'survivor'),
-            },
+                'role': user.role
+            }
         }, status=status.HTTP_201_CREATED)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    permission_classes = [permissions.AllowAny]
-
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
-            username = request.data.get('username')
             try:
-                user = User.objects.get(username=username)
+                user = User.objects.get(username=request.data.get('username'))
                 response.data['user'] = {
                     'id': user.id,
                     'username': user.username,
                     'email': user.email,
-                    'role': getattr(user, 'role', 'survivor'),
+                    'role': getattr(user, 'role', 'survivor')
                 }
-                log_action('login', user=user)
             except User.DoesNotExist:
                 pass
         return response
+
 
 class GoogleAuthCallbackView(APIView):
     permission_classes = [AllowAny]
@@ -73,7 +76,6 @@ class GoogleAuthCallbackView(APIView):
         # If user_info not provided, fetch from Google
         if not user_info:
             try:
-                import requests
                 response = requests.get(
                     'https://www.googleapis.com/oauth2/v3/userinfo',
                     headers={'Authorization': f'Bearer {access_token}'}
@@ -110,7 +112,6 @@ class GoogleAuthCallbackView(APIView):
             )
         
         # Generate JWT tokens
-        from rest_framework_simplejwt.tokens import RefreshToken
         refresh = RefreshToken.for_user(user)
         
         return Response({

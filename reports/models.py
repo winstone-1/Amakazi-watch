@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 class IncidentReport(models.Model):
-    id = models.AutoField(primary_key=True)  # Changed from UUID to AutoField
+    id = models.UUIDField(primary_key=True)  # Changed from UUID to AutoField
     ABUSE_TYPES = [
         ('physical', 'Physical Abuse'),
         ('sexual', 'Sexual Abuse'),

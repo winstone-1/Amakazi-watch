@@ -328,3 +328,10 @@ CORS_ALLOW_HEADERS = [
 
 # Additional security headers
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://amakazi-watch.pages.dev",
+    "https://amakazi-watch.onrender.com",
+]

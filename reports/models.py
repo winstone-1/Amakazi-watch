@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 class IncidentReport(models.Model):
-    id = models.UUIDField(primary_key=True)  # Changed from UUID to AutoField
+    id = models.AutoField(primary_key=True)  # ← AutoField
     ABUSE_TYPES = [
         ('physical', 'Physical Abuse'),
         ('sexual', 'Sexual Abuse'),
@@ -46,7 +46,7 @@ class IncidentReport(models.Model):
 
 
 class Report(models.Model):
-    id = models.AutoField(primary_key=True)  # Changed from UUID to AutoField
+    id = models.AutoField(primary_key=True)  # ← AutoField
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     abuse_type = models.CharField(max_length=50)
     county = models.CharField(max_length=50)

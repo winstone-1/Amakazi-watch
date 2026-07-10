@@ -195,7 +195,7 @@ SMSLog
 - Django + DRF API, MySQL, JWT auth, Google OAuth
 - Anonymous reporting + Africa's Talking SMS
 - Cloudinary file storage
-- M-Pesa Daraja donations
+- M-Pesa Paystack donations
 - Google Maps org directory
 - Groq AI chatbot + report classifier + content moderation
 - Gamified quizzes + NGO impact dashboard
